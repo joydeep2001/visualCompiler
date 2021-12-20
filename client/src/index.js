@@ -10,6 +10,10 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
+const codeMirror = document.querySelectorAll('.CodeMirror');
+codeMirror[0].style.height = '300px';
+codeMirror[1].style.height = '200px';
+codeMirror[1].style.background = '#0f0f0f';
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

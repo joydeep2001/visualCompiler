@@ -1,0 +1,7 @@
+.visualWrapper {
+    height: 536px;
+    width: 100%;
+    border:2px solid #000;
+    display:'grid';
+    grid-template-rows: 400px 136px;
+}
