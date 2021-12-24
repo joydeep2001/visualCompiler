@@ -49,7 +49,8 @@ export default class Body extends React.Component{
     state = {
         code: '',
         language: 'text',
-        ExeBoard: false
+        ExeBoard: false,
+        output: ''
     }
 
     handleChange = (val) => {
@@ -59,6 +60,9 @@ export default class Body extends React.Component{
             )
         });
         // console.log(this.state.value);
+    }
+    handleOutputChange = (val) => {
+        this.setState({output: val});
     }
     componentDidUpdate() {
         
@@ -71,7 +75,8 @@ export default class Body extends React.Component{
         this.setState(() => ({ExeBoard : !this.state.ExeBoard}))
     }
     handleRunCode = async() => {
-        const response = await fetch(url, {
+        this.setState({output: "Compiling..."});
+        const response = await fetch("http://localhost:3001/api/compile", {
             method: 'POST',
             mode: 'cors', 
             cache: 'no-cache', 
@@ -82,8 +87,19 @@ export default class Body extends React.Component{
             },
             redirect: 'follow', 
             referrerPolicy: 'no-referrer', 
-            body: this.state.code 
+            body: JSON.stringify({
+                code: this.state.code, 
+                language: this.state.language
+            }) 
           });
+          let res = await response.json();
+          if(res.err) {
+              console.log(res.err);
+              this.setState({output: res.err});
+              return;
+          }
+          console.log("code compiled");
+          this.setState({output: "code compiled"});
     }
     
     render() {
@@ -107,7 +123,10 @@ export default class Body extends React.Component{
                         <div key={'divider'} style={divider}>
                             Output
                         </div>
-                        <OutputBox />
+                        <OutputBox 
+                            value={this.state.output}
+                            onChange={this.handleOutputChange}
+                        />
                     </div>
 
                     <div key={'visualsWrap'} style={visualsWrap}>

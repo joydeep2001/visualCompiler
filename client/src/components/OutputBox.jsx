@@ -28,7 +28,8 @@ export default function OutputBox(props) {
                 options={
                     {
                         lineWrapping: true,
-                        theme: 'material'
+                        theme: 'material',
+                        mode:''
                     }
                 }
                 
