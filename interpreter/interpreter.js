@@ -14,7 +14,7 @@ const keywards = {
     const identifierExpression = '(\\w+)\\s*'; 
     const functionParametersExpression = '(\\(.*\\))';
     const whiteSpaceExpression = '^\\s*\\t*';
-    //const initializationExpression = ;
+    const initializationExpression = '';
 
 
     const includeDetector = /#include.+/gm;
@@ -58,6 +58,7 @@ const keywards = {
     console.log(code = code.replace(functionDefinationDetector, 'function $1$2'));
     console.log(code = code.replace(functionDeclarationDetector, ''));
     console.log(code.match(functionCallDetector));
+    
 //Function Defination
     //Detect
     //Transpile
