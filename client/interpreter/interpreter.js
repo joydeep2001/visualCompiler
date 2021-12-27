@@ -10,18 +10,18 @@ const keywards = {
     //Transpile
     
 
-    const dataTypeExpression = '(?:\\w+\\**\\s+\\**)+(?:\\s*\\**\\s*)*';
-    const identifierExpression = '(\\w+)\\s*'; 
-    const functionParametersExpression = '(\\(.*\\))';
+    const dataType = '(?:\\w+\\**\\s+\\**)+(?:\\s*\\**\\s*)*';
+    const identifier = '(\\w+)\\s*'; 
+    const functionParameters = '(\\(.*\\))';
     const whiteSpaceExpression = '^\\s*\\t*';
-    const initializationExpression = '';
+    const initialization = '';
 
 
     const includeDetector = /#include.+/gm;
     const macroDefinitionDetector = /#define\s(\w+)\s+(.+)/;
-    const functionDefinationDetector = new RegExp(whiteSpaceExpression + dataTypeExpression + identifierExpression + functionParametersExpression + '[^;?]', 'gm');
-    const functionDeclarationDetector = new RegExp(whiteSpaceExpression + dataTypeExpression + identifierExpression + functionParametersExpression + ';', 'gm');
-    const functionCallDetector = new RegExp(whiteSpaceExpression + identifierExpression + functionParametersExpression, 'gm');
+    const functionDefinationDetector = new RegExp(whiteSpaceExpression + dataType + identifier + functionParameters + '[^;?]', 'gm');
+    const functionDeclarationDetector = new RegExp(whiteSpaceExpression + dataType + identifier + functionParameters + ';', 'gm');
+    const functionCallDetector = new RegExp(whiteSpaceExpression + identifier + functionParameters, 'gm');
     //const variableDefinitionDetector1 = new RegExp(whiteSpaceExpression + identifierExpression);
     //const variableDefinitionDetector2 = new RegExp(whiteSpaceExpression + identifierExpression + initializationExpression);
     let code = 
@@ -52,7 +52,7 @@ const keywards = {
     
     }`;
     //console.log(code);
-    console.log(whiteSpaceExpression + identifierExpression + functionParametersExpression);
+    console.log(whiteSpaceExpression + identifier + functionParameters);
     console.log(code = code.replace(includeDetector, ''));
     console.log(code.match(macroDefinitionDetector));
     console.log(code = code.replace(functionDefinationDetector, 'function $1$2'));
