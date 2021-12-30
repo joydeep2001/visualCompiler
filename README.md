@@ -13,7 +13,7 @@ This project is about to create a interactive code simulator. It will help the l
 #### 2)To Run the react server enter the following command:
 ### `npm start`
 #### 3) To Run the backend server enter the following command:
-### `cd .. && npm start`
+### `cd .. && node server.js`
 
 Now you are ready to go..
 
