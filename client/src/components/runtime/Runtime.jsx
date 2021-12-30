@@ -2,14 +2,15 @@ import ActivationRecord from "./ActivationRecord";
 import './runtime.css';
 import React from "react";
 
-export default class Runtime {
-    state = {
-        virtualCallStack: Array(),
-        virtualHeap: Array(),
+export default class Runtime extends React.Component{
+    // state = {
+    //     virtualCallStack: new Array(),
+    //     virtualHeap: new Array(),
         
-        virtualDataSegment: Array(),
-        virtualBSS: Array()
-    }
+    //     virtualDataSegment: new Array(),
+    //     virtualBSS: new Array()
+    // }
+    macroMap = new Map();
     render() {
         return (
             <div className="visualWrapper" key={'visualWrapper'}>
