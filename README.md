@@ -1,6 +1,6 @@
 # Visual Compiler (Under Development)
 
-This project is about to create a interactive code simulator. It will help the students how programs runs under the hood. For each statement executation what updates in memory etc.
+This project is about to create a interactive code simulator. It will help the learners to understand how programs runs under the hood. Like for each statement executation what is changed in the memory or what is inside the call stack etc.
 
 ## Steps to run the code
 
@@ -9,7 +9,7 @@ This project is about to create a interactive code simulator. It will help the s
 ### `git clone https://github.com/joydeep2001/visualCompiler.git`
 #### 2) Install dependencis. To install the dependencies run: 
 ### `npm install && cd client && npm install` 
-### (Make sure you are inside the root directory of the project by default it's name is visualCompiler)
+### (Make sure you are inside the root directory of the project by default it's name is visualCompiler while doing step 2)
 #### 2)To Run the react server enter the following command:
 ### `npm start`
 #### 3) To Run the backend server enter the following command:
