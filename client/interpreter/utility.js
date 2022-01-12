@@ -4,7 +4,8 @@ const {
     macroDefinitionDetector,
     functionCallDetector,
     functionSignatureDetector,
-    variableDefinitionDetector
+    variableDefinitionDetector,
+    loopDetector
 } = require('./regularExpression');
 
 console.log(functionSignatureDetector);
@@ -29,7 +30,7 @@ function CLikeInterpreterUtilities(code) {
         return length;
     } 
     
-    function extractParameters(lineCount, column, func) {
+    function tokenizeParameters(lineCount, column, func) {
         //console.log('line number', lineCount);
         // console.log('start column', column);
         //console.log(`Function name ${func[4]}\n Parameter ${func[6]}`);
@@ -47,12 +48,51 @@ function CLikeInterpreterUtilities(code) {
 
             });
         }
-        console.log(paramsList);
+        //console.log(paramsList);
         return paramsList;
         
     }
-    function extractBody() {
+    function extractBody(functionSignEndsAt) {
         
+        let startOfBody = functionSignEndsAt;
+        for(;code[startOfBody] != '{';startOfBody++);
+
+        let braceBalance = 1;
+        let endOfBody = startOfBody + 1
+        for(;braceBalance !== 0;endOfBody++) {
+            if(code[endOfBody] == '{') braceBalance++;
+            else if(code[endOfBody] == '}') braceBalance--;
+        }
+        console.log(startOfBody, endOfBody);
+        return {
+            startOfBody,
+            endOfBody
+        }
+
+    }
+    function tokenizeBody(startOfBody, endOfBody, functionName) {
+        let functionBody = '';
+        for(let i = startOfBody;i < endOfBody;i++) {
+            functionBody += code[i];
+        }
+        let statements = functionBody.split(';');
+        let currentPos = startOfBody;
+        console.log("In function " + functionName);
+        statements.forEach(statement => {
+            if(statement.match(loopDetector)) {
+                console.log('loop at ' + currentPos);
+            }
+            else if(statement.match(functionCallDetector)) {
+                console.log('function call at' + currentPos);
+            }
+            else if(statement.match(variableDefinitionDetector)) {
+                console.log("variable at " + currentPos);
+            }
+            else {
+                console.log(statement);
+            }
+            currentPos += statement.length + 1; //adding one to count the semicolon
+        });
     }
     this.createFunctionMap = () => {
         let temp = '';
@@ -70,7 +110,13 @@ function CLikeInterpreterUtilities(code) {
                 let startColumn = startIndexOfFunction - lastLineEndIndex;
                 temp = '';
                 lastFunctionEndIndex = i + 1;
-                extractParameters(lineCount, startColumn, func);
+                tokenizeParameters(lineCount, startColumn, func);
+                const {
+                    startOfBody,
+                    endOfBody
+                } = extractBody(i);
+                let funcName = func[4];
+                tokenizeBody(startOfBody, endOfBody, funcName);
             }
             if(code[i] == '\n') {
                 lineCount++;
@@ -80,7 +126,7 @@ function CLikeInterpreterUtilities(code) {
         }
         if(temp != '') lineCount++;
 
-        console.log(lineCount);
+        //console.log(lineCount);
     }
 
     
