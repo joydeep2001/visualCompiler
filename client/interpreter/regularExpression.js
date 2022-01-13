@@ -1,6 +1,6 @@
 const dataType = '((?:\\w+\\**\\s+\\**)+)(\\s*\\**)*';
 const identifier = '(\\w+)'; 
-const functionParameters = '\\((.*)\\)';
+const functionParameters = '\\((.*\\n*.*)\\)';
 const optionalWhiteSpace = '\\s*\\t*\\n*';
 
 
