@@ -4,11 +4,11 @@ const {
     macroDefinitionDetector,
     functionCallDetector,
     functionSignatureDetector,
-    variableDefinitionDetector,
+    parameterDefinitionDetector,
     loopDetector
 } = require('./regularExpression');
 
-console.log(functionSignatureDetector);
+
 
 function CLikeInterpreterUtilities(code) {
     this.getMacroMap = () => {
@@ -30,46 +30,44 @@ function CLikeInterpreterUtilities(code) {
         return length;
     } 
     
-    function tokenizeParameters(lineCount, column, func) {
+    function tokenizeParameters(column, func, self) {
         //console.log('line number', lineCount);
         // console.log('start column', column);
         //console.log(`Function name ${func[4]}\n Parameter ${func[6]}`);
         //console.log(func);
         let params;
         let paramsList = [];
-        while(params = variableDefinitionDetector.exec(func[0])) {
+        while(params = parameterDefinitionDetector.exec(func[0])) {
             //console.log(params);
             paramsList.push({
                 name: params[4],
                 datatype: params[1] + (params[2] ? params[2] : ''),
-                line: lineCount,
-                startColumn: params.index + column,
-                endColumn: getEndIndex(params)
+                startPosition: self.getLineColumn(params.index + column),
+                endPosition: self.getLineColumn(parameterDefinitionDetector.lastIndex + column)
 
             });
         }
-        //console.log(paramsList);
+        console.log(paramsList);
         return paramsList;
         
     }
     function extractBody(functionSignEndsAt) {
         
         let startOfBody = functionSignEndsAt;
-        console.log(code[functionSignEndsAt]);
         let braceBalance = 1;
         let endOfBody = startOfBody + 1
         for(;braceBalance !== 0;endOfBody++) {
             if(code[endOfBody] == '{') braceBalance++;
             else if(code[endOfBody] == '}') braceBalance--;
         }
-        console.log(startOfBody, endOfBody);
+        //console.log(startOfBody, endOfBody);
         return {
             startOfBody,
             endOfBody
         }
 
     }
-    function tokenizeBody(startOfBody, endOfBody, functionName) {
+    function tokenizeBody(startOfBody, endOfBody, functionName, self) {
         let functionBody = '';
         for(let i = startOfBody;i < endOfBody;i++) {
             functionBody += code[i];
@@ -77,15 +75,25 @@ function CLikeInterpreterUtilities(code) {
         let statements = functionBody.split(';');
         let currentPos = startOfBody;
         console.log("In function " + functionName);
+        let root = {
+            name: functionName,
+            next: []
+        }
+        let currentNode = root;
         statements.forEach(statement => {
+            
             if(statement.match(loopDetector)) {
                 console.log('loop at ' + currentPos);
             }
             else if(statement.match(functionCallDetector)) {
                 console.log('function call at' + currentPos);
             }
-            else if(statement.match(variableDefinitionDetector)) {
+            else if(details = statement.match(parameterDefinitionDetector)) {
                 console.log("variable at " + currentPos);
+                console.log(details);
+                // currentNode.next.push({
+
+                // });
             }
             else {
                 console.log(statement);
@@ -96,6 +104,7 @@ function CLikeInterpreterUtilities(code) {
    
     this.indexVsLine = [0];
     this.mapIndexVsLine = () => {
+        
         for(let i = 0;i < code.length;i++) {
             if(code[i] == '\n') {
                 this.indexVsLine.push(i);
@@ -123,9 +132,14 @@ function CLikeInterpreterUtilities(code) {
     this.createFunctionMap = () => {
         while(func = functionSignatureDetector.exec(code)) {
             // console.log('starts at ', func.index);
-            console.log('ends at', functionSignatureDetector.lastIndex - 1);
+            //console.log('ends at', functionSignatureDetector.lastIndex - 1);
             //console.log(func[0][func[0].length - 1]);
-            extractBody(functionSignatureDetector.lastIndex - 1);
+            //tokenizeParameters(func.index, func, this);
+            const {
+                startOfBody,
+                endOfBody
+            } = extractBody(functionSignatureDetector.lastIndex - 1);
+            tokenizeBody(startOfBody, endOfBody, func[4], this);
         }
 
     }
