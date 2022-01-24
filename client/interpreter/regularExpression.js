@@ -12,11 +12,15 @@ const functionCallDetector = new RegExp(optionalWhiteSpace + identifier + parame
 const parameterDefinitionDetector = new RegExp(`${dataType}(${optionalWhiteSpace})${identifier}${optionalWhiteSpace}[,\\)][^\\(]`, 'gm');
 // const multiVariableDefinationDetector = new RegExp(`(int)\*?\s((\w+(\[(\d+|\w+)\])?(\s*?=\s*(\d+|'.+|".+"|\w+|\{.\}))?\s*[,;]\s*)+)`);
 const whileloopDetector = new RegExp(`while${optionalWhiteSpace}${parameters}`);
+const partialForLoopDetector = new RegExp(`for${optionalWhiteSpace}\\(.*`);
 const forloopDetector = new RegExp(`for${optionalWhiteSpace}${parameters}`);
 const ifDetector = new RegExp(`if${optionalWhiteSpace}${parameters}`);
 const elseIfDetector = new RegExp(`else if${optionalWhiteSpace}${parameters}`);
-const elseDetector = new RegExp(`else if${optionalWhiteSpace}${parameters}`);
+const elseDetector = new RegExp(`else`);
+const variableDetector = new RegExp(`${dataType}${optionalWhiteSpace}${identifier}`);
+const expressionDetector = new RegExp(`(\d*\w*${optionalWhiteSpace}[-/+*=<>]+${optionalWhiteSpace}\d*\w*)*`);
 
+console.log("-------------debug--------------------");
 console.log('functionSignatureDetector', functionSignatureDetector);
 console.log('functionCallDetector', functionCallDetector);
 console.log('parameterDefinitionDetector', parameterDefinitionDetector);
@@ -25,7 +29,8 @@ console.log('forloopDetector', forloopDetector);
 console.log('if detector', ifDetector);
 console.log('else if detector', elseIfDetector);
 console.log('else detector', elseDetector);
-
+console.log('variable detector', variableDetector);
+console.log("-------------end--------------------");
 
 module.exports = {
     includeDetector,
@@ -33,5 +38,12 @@ module.exports = {
     functionCallDetector,
     functionSignatureDetector,
     parameterDefinitionDetector,
-    whileloopDetector
+    whileloopDetector,
+    partialForLoopDetector,
+    forloopDetector,
+    ifDetector,
+    elseIfDetector,
+    elseDetector,
+    variableDetector,
+    expressionDetector
 }
