@@ -50,10 +50,29 @@ export default class Body extends React.Component{
         code: '',
         language: 'text',
         ExeBoard: false,
-        output: ''
+        output: '',
+        highlight: {
+            from:{line: 2, ch: 1},
+            to:{line: 2, ch: 5}
+        },
+        
+    }
+    editor = null;
+    lastMark = null;
+    from = {line: 2, ch: 1};
+    to = {line: 2, ch: 5};
+    highlightLines = (editor, start, end) => {
+        const from = {...this.state.highlight.from};
+        const to = {...this.state.highlight.to};
+        console.log(from, to);
+        editor.markText(from, to, {className: "codemirror-highlighted"});
+        from.line++;
+        to.line++;
+        
     }
 
-    handleChange = (val) => {
+    handleChange = (val, editor) => {
+        this.editor = editor;
         this.setState((state) => {
             return (
                 state.code = val
@@ -101,24 +120,41 @@ export default class Body extends React.Component{
           console.log("code compiled");
           this.setState({output: "code compiled"});
     }
+    handleNext = () =>{
+        console.log("next");
+        // let from = {...this.state.highlight.from};
+        // let to = {...this.state.highlight.from};
+        // from.line++;
+        // to.line++;
+        
+        // this.setState({highlight: {from, to}});
+        if(this.lastMark) this.lastMark.clear();
+        this.lastMark = this.editor.markText(this.from, this.to, {className: "codemirror-highlighted"});
+        this.from.line++;
+        this.to.line++;
+    }
     
     render() {
              const {toggleState, toggleMenuStatus} = this.props;
              const items = [1, 2, 3];
+             console.log(this.state.highlight);
             return (
             <>
             <ToolBar 
                 onSelect = {this.handleSelect}
                 onMaximize={this.handleExeBoardToggle}
                 onRun={this.handleRunCode}
+                onNext={this.handleNext}
             />
             <div className="body" key={'body'} >
                 <div key={'contains'} style={containStyle}>
                     <div key={'codeEditorWrapper'} style={codeEditorWrapper}> 
                         <CodeEditor 
+                            key={'editor'}
                             value={this.state.code} 
                             onChange={this.handleChange}
                             language={this.state.language}
+                            highlight={this.state.highlight}
                         />
                         <div key={'divider'} style={divider}>
                             Output

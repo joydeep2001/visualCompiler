@@ -50,7 +50,8 @@ export default function ToolBar(props) {
     const {
         onSelect,
         onMaximize,
-        onRun
+        onRun,
+        onNext
     } = props;
     function handleChange(e) {
         onSelect(e.target.value);
@@ -60,6 +61,9 @@ export default function ToolBar(props) {
     }
     function handleRun() {
         onRun();
+    }
+    function handleNext() {
+        onNext();
     }
 
     return (
@@ -75,7 +79,7 @@ export default function ToolBar(props) {
                 <div key={'codeHeader'} style={codeHeader}>
                     <p>Code</p>
                     <button style={{margin:'2px'}} onClick={handleRun}>Run</button>
-                    <button style={{margin:'2px'}}>Stop</button>
+                    <button style={{margin:'2px'}} onClick={handleNext}>Next</button>
                     <button style={{margin:'2px'}}>Pause</button>
                 </div>
             </div>
