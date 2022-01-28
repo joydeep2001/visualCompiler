@@ -15,7 +15,7 @@ export default class Interpreter {
     };
     console.log("self", this.self);
     this.virtualCallStack.push(func);
-    //this.self.setState({ top: 0 });
+    this.self.setState({ top: 0 });
   };
   static readToken = () => {
     console.log(this.self.state.programCounter);
@@ -26,7 +26,8 @@ export default class Interpreter {
     if (this.currInstruction.type == "variable") {
       this.processVariable(
         this.currInstruction.name,
-        this.currInstruction.initialValue
+        this.currInstruction.initialValue,
+        this.currInstruction.datatype
       );
     } else if (this.currInstruction.type == "expression") {
       this.processExpression(this.currInstruction.value);
@@ -37,19 +38,14 @@ export default class Interpreter {
       programCounter: prevState.programCounter + 1,
     }));
   };
-  static processVariable = (name, value) => {
-    //this.virtualCallStack[this.self.state.top].data[name] = value;
+  static processVariable = (name, value, datatype) => {
+    // this.virtualCallStack[0].data[name] = { value, datatype };
+    this.virtualCallStack[this.self.state.top].data[name] = { value, datatype };
     console.log("vs", this.virtualCallStack);
   };
   static processExpression = expression => {
     console.log("expression");
-    //let activeStackFrame = this.virtualCallStack.data[this.self.state.top];
-    let activeStackFrame = {
-      a: 10,
-      b: 20,
-      c: 35,
-      k: 15,
-    };
+    let activeStackFrame = this.virtualCallStack[this.self.state.top].data;
     let operandExp = /\w+/g;
     let operand;
     let modifiedExpression = "";
@@ -61,16 +57,17 @@ export default class Interpreter {
 
       modifiedExpression += variableName.replace(
         operand[0],
-        `activeStackFrame['${operand[0]}']`
+        `activeStackFrame['${operand[0]}'].value`
       );
       start = operandExp.lastIndex;
       console.debug(start);
       console.log(modifiedExpression);
     }
     console.log(modifiedExpression);
-    eval(modifiedExpression);
-    console.log(activeStackFrame.a);
+
+    console.log(eval(modifiedExpression));
   };
+
   static updateMark = () => {
     console.log(this.editor);
     if (this.self.lastMark) this.self.lastMark.clear();
@@ -82,10 +79,10 @@ export default class Interpreter {
   };
 }
 //test area
-setTimeout(() => {
-  console.log(Interpreter.self);
-  Interpreter.processExpression("a = b * c + k");
-  Interpreter.initCallStack();
-  Interpreter.processVariable("a", 5);
-  Interpreter.processExpression("b", 7);
-}, 1000);
+// setTimeout(() => {
+//   console.log(Interpreter.self);
+// Interpreter.processExpression("a = b * c + k");
+//   Interpreter.initCallStack();
+//   Interpreter.processVariable("a", 5, "int");
+//   Interpreter.processVariable("b", 7, "float");
+// }, 1000);
