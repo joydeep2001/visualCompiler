@@ -51,16 +51,13 @@ export default class Body extends React.Component {
     top: -1,
     programCounter: 0,
   };
-  virtualCallStack = new Array();
-  editor = null;
-  lastMark = null;
 
-  componentDidMount() {
+  constructor(props) {
+    super(props);
     Interpreter.init(this);
   }
-
   handleChange = (val, editor) => {
-    this.editor = editor;
+    Interpreter.editor = editor;
     this.setState(state => {
       return (state.code = val);
     });
@@ -102,12 +99,7 @@ export default class Body extends React.Component {
     console.log("code compiled");
     this.setState({ output: "code compiled" });
     //initializing stack frame
-    const func = {
-      name: "main",
-      data: [],
-    };
-    this.virtualCallStack.push(func);
-    this.setState({ top: 0 });
+    Interpreter.initCallStack();
   };
   handleNext = () => {
     console.log("next");
@@ -145,7 +137,7 @@ export default class Body extends React.Component {
 
             <div key={"visualsWrap"} style={visualsWrap}>
               <div key={"visual"} style={visuals}>
-                <Runtime virtualCallStack={this.virtualCallStack} />
+                <Runtime virtualCallStack={Interpreter.virtualCallStack} />
                 {/* { this.state.ExeBoard ?  <ExecutionBoard onMinimize={this.handleExeBoardToggle} /> : <></>} */}
               </div>
             </div>

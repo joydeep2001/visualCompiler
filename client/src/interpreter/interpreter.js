@@ -1,9 +1,21 @@
 import token from "./token2.sample";
 
 export default class Interpreter {
+  static virtualCallStack = new Array();
+  static editor = null;
+  static lastMark = null;
   static currentCall = "main";
   static init = self => {
     this.self = self;
+  };
+  static initCallStack = () => {
+    const func = {
+      name: "main",
+      data: {},
+    };
+    console.log("self", this.self);
+    this.virtualCallStack.push(func);
+    //this.self.setState({ top: 0 });
   };
   static readToken = () => {
     console.log(this.self.state.programCounter);
@@ -12,7 +24,10 @@ export default class Interpreter {
 
     console.log(this.currInstruction);
     if (this.currInstruction.type == "variable") {
-      this.processVariable();
+      this.processVariable(
+        this.currInstruction.name,
+        this.currInstruction.initialValue
+      );
     } else if (this.currInstruction.type == "expression") {
       this.processExpression(this.currInstruction.value);
     }
@@ -22,15 +37,13 @@ export default class Interpreter {
       programCounter: prevState.programCounter + 1,
     }));
   };
-  static processVariable = () => {
-    this.self.virtualCallStack[this.self.state.top].data.push({
-      name: this.currInstruction.name,
-      value: this.currInstruction.initialValue,
-    });
+  static processVariable = (name, value) => {
+    //this.virtualCallStack[this.self.state.top].data[name] = value;
+    console.log("vs", this.virtualCallStack);
   };
   static processExpression = expression => {
     console.log("expression");
-    //let activeStackFrame = this.self.virtualCallStack.data[this.self.state.top];
+    //let activeStackFrame = this.virtualCallStack.data[this.self.state.top];
     let activeStackFrame = {
       a: 10,
       b: 20,
@@ -59,9 +72,9 @@ export default class Interpreter {
     console.log(activeStackFrame.a);
   };
   static updateMark = () => {
-    console.log(this.self.editor);
+    console.log(this.editor);
     if (this.self.lastMark) this.self.lastMark.clear();
-    this.self.lastMark = this.self.editor.markText(
+    this.self.lastMark = this.editor.markText(
       this.currInstruction.from,
       this.currInstruction.to,
       { className: "codemirror-highlighted" }
@@ -70,5 +83,9 @@ export default class Interpreter {
 }
 //test area
 setTimeout(() => {
+  console.log(Interpreter.self);
   Interpreter.processExpression("a = b * c + k");
-}, 1);
+  Interpreter.initCallStack();
+  Interpreter.processVariable("a", 5);
+  Interpreter.processExpression("b", 7);
+}, 1000);
