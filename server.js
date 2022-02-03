@@ -3,9 +3,7 @@ const {
   getFileExtension,
   compile,
 } = require("./controller/compileUtils");
-const { exec } = require("child_process");
-const fs = require("fs");
-const fspromises = require("fs").promises;
+
 const express = require("express");
 const app = express();
 const cors = require("cors");

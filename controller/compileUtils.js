@@ -1,3 +1,7 @@
+const { exec } = require("child_process");
+const fs = require("fs");
+const fspromises = require("fs").promises;
+
 function getFileExtension(language) {
   if (language == "clike") return "c";
 }
