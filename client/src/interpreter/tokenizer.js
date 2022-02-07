@@ -1,3 +1,4 @@
+const express = require("express");
 const {
   functionCallDetector,
   parameterDefinitionDetector,
@@ -11,6 +12,8 @@ const {
   expressionDetector,
   returnStatementDetector,
 } = require("./regularExpression");
+
+//debugging
 
 //temporary array
 const libFunctions = ["printf", "scanf"];
@@ -41,6 +44,20 @@ function ReturnWrapper(returnDetails, from, to) {
   this.type = "return";
   this.value = `$=${returnDetails.value}`;
   this.returnType = returnDetails.returnType;
+  this.from = from;
+  this.to = to;
+}
+function FunctionWrapper(functionDetails, from, to) {
+  this.type = "function_call";
+  this.name = functionDetails.functionName;
+  this.args = functionDetails.args;
+  this.from = from;
+  this.to = to;
+}
+function LibFunctionWrapper(functionDetails, from, to) {
+  this.type = "lib_function_call";
+  this.name = functionDetails.functionName;
+  this.args = functionDetails.args;
   this.from = from;
   this.to = to;
 }
@@ -141,6 +158,36 @@ function Tokenizer(statements, self) {
       } else if ((statementDetails = statement.match(functionCallDetector))) {
         console.log("function detected: ");
         console.log(statementDetails);
+        let functionName = statementDetails[1].trim();
+        let args = statementDetails[2].split(",").map(arg => arg.trim());
+        currentPos += statementDetails.index;
+        from = self.getLineColumn(currentPos);
+        currentPos += statementDetails[0].length;
+        to = self.getLineColumn(currentPos);
+        currentPos++; //for semicolon
+        if (libFunctions.find(name => name == functionName)) {
+          this.flowGraph.push(
+            new LibFunctionWrapper(
+              {
+                functionName,
+                args,
+              },
+              from,
+              to
+            )
+          );
+        } else {
+          this.flowGraph.push(
+            new FunctionWrapper(
+              {
+                functionName,
+                args,
+              },
+              from,
+              to
+            )
+          );
+        }
       } else if ((statementDetails = statement.match(variableDetector))) {
         console.log("variable detected: ");
         currentPos += statementDetails.index;
@@ -164,6 +211,7 @@ function Tokenizer(statements, self) {
       console.log(statement);
       //currentPos += statement.length + 1; //adding one to count the semicolon
     }
+    console.log(this.flowGraph);
   };
   this.tokenizeParameters = (column, func) => {
     //console.log('line number', lineCount);
