@@ -113,7 +113,7 @@ function Tokenizer(statements, self) {
         );
         console.log(this.pendingTaskStack);
 
-        console.log(this.flowGraph);
+        //console.log(this.flowGraph);
         if (incrementDecrement) {
           let firstBodyToken = statements[i + 2].slice(
             incrementDecrement.length - 1
@@ -154,7 +154,7 @@ function Tokenizer(statements, self) {
             to
           )
         );
-        console.log(this.flowGraph);
+        //console.log(this.flowGraph);
       } else if ((statementDetails = statement.match(functionCallDetector))) {
         console.log("function detected: ");
         console.log(statementDetails);
@@ -196,9 +196,17 @@ function Tokenizer(statements, self) {
         to = self.getLineColumn(currentPos);
         currentPos++;
         console.log(statementDetails);
-        this.flowGraph.push(new VariableWrapper(statementDetails, from, to));
-      } else if (statement.match(expressionDetector)) {
+        //this.flowGraph.push(new VariableWrapper(statementDetails, from, to));
+      } else if ((statementDetails = statement.match(expressionDetector))) {
         console.log("expression detected: ");
+        console.log(statementDetails);
+        let expression = statementDetails[0];
+        currentPos += statementDetails.index;
+        from = self.getLineColumn(currentPos);
+        currentPos += statementDetails[0].length;
+        to = self.getLineColumn(currentPos);
+        currentPos++; //for semicolon
+        this.flowGraph.push(new ExpressionWrapper(expression, from, to));
       } else if (statement.match("break")) {
         console.log("break");
       } else if (statement.match("continue")) {
