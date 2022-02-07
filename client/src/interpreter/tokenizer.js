@@ -13,103 +13,68 @@ const {
   returnStatementDetector,
 } = require("./regularExpression");
 
+const {
+  ExpressionWrapper,
+  ConditionWrapper,
+  VariableWrapper,
+  ReturnWrapper,
+  FunctionWrapper,
+  LibFunctionWrapper,
+} = require("./tokenWrappers");
+
 //debugging
 
 //temporary array
 const libFunctions = ["printf", "scanf"];
 
-function ExpressionWrapper(expression, from, to) {
-  this.type = "expression";
-  this.value = expression;
-  this.from = from;
-  this.to = to;
-}
-function ConditionWrapper(condition, from, to) {
-  this.type = "condition";
-  this.value = condition;
-  this.nextIfFalse = null;
-  this.from = from;
-  this.to = to;
-}
-
-function VariableWrapper(variableDetails, from, to) {
-  this.name = variableDetails[3];
-  this.datatype =
-    variableDetails[1] + (variableDetails[2] ? variableDetails[2] : "");
-  this.from = from;
-  this.to = to;
-}
-
-function ReturnWrapper(returnDetails, from, to) {
-  this.type = "return";
-  this.value = `$=${returnDetails.value}`;
-  this.returnType = returnDetails.returnType;
-  this.from = from;
-  this.to = to;
-}
-function FunctionWrapper(functionDetails, from, to) {
-  this.type = "function_call";
-  this.name = functionDetails.functionName;
-  this.args = functionDetails.args;
-  this.from = from;
-  this.to = to;
-}
-function LibFunctionWrapper(functionDetails, from, to) {
-  this.type = "lib_function_call";
-  this.name = functionDetails.functionName;
-  this.args = functionDetails.args;
-  this.from = from;
-  this.to = to;
-}
-
 function Tokenizer(statements, self) {
-  this.pendingTaskStack = [];
-  this.lastTokenStack = [];
-
+  pendingTaskStack = [];
+  lastTokenStack = [];
+  this.statementDetails;
+  this.from, this.to;
   this.flowGraph = [];
+  this.currentPos;
   this.tokenizeBody = (startOfBody, functionName) => {
-    let currentPos = startOfBody;
+    this.currentPos = startOfBody;
 
     console.log("In function " + functionName);
     for (let i = 0; i < statements.length; i++) {
       let statement = statements[i];
-      let statementDetails;
-      let from, to;
-      if ((statementDetails = statement.match(partialForLoopDetector))) {
+      if ((this.statementDetails = statement.match(partialForLoopDetector))) {
         console.log("for loop detected: ");
 
         //tokenize inititalization of for loop
         let initialization = statement.match(/\(.+/);
-        currentPos += initialization.index;
-        console.log(currentPos);
-        from = self.getLineColumn(currentPos);
-        currentPos += initialization[0].length;
-        to = self.getLineColumn(currentPos);
-        currentPos++; //for counting the semicolon
+        this.currentPos += initialization.index;
+        console.log(this.currentPos);
+        this.from = self.getLineColumn(this.currentPos);
+        this.currentPos += initialization[0].length;
+        this.to = self.getLineColumn(this.currentPos);
+        this.currentPos++; //for counting the semicolon
         this.flowGraph.push(
-          new ExpressionWrapper(initialization[0].slice(1), from, to)
+          new ExpressionWrapper(initialization[0].slice(1), this.from, to)
         );
-        console.log(currentPos);
+        console.log(this.currentPos);
 
         //tokenize condition of for loop
         let condition = statements[i + 1];
-        from = self.getLineColumn(currentPos);
-        currentPos += condition.length;
-        to = self.getLineColumn(currentPos);
-        currentPos++;
-        this.flowGraph.push(new ConditionWrapper(condition, from, to));
+        this.from = self.getLineColumn(this.currentPos);
+        this.currentPos += condition.length;
+        this.to = self.getLineColumn(this.currentPos);
+        this.currentPos++;
+        this.flowGraph.push(new ConditionWrapper(condition, this.from, to));
         this.lastTokenStack.push(i + 1); //pushing the index of condition of the loop
 
         //tokenize increment decrement
         let incrementDecrementDetails = statements[i + 2].match(/.+\)/);
         let incrementDecrement = incrementDecrementDetails[0].slice(0, -1);
-        from = self.getLineColumn(currentPos);
-        currentPos += incrementDecrement.length;
-        to = self.getLineColumn(currentPos);
-        currentPos++; //for closing bracket
+        this.from = self.getLineColumn(this.currentPos);
+        this.currentPos += incrementDecrement.length;
+        this.to = self.getLineColumn(this.currentPos);
+        this.currentPos++; //for closing bracket
 
         this.pendingTaskStack.push(
-          new ExpressionWrapper(incrementDecrement, from, to)
+          new ExpressionWrapper(incrementDecrement, this.from, to)
         );
         console.log(this.pendingTaskStack);
 
@@ -134,79 +99,19 @@ function Tokenizer(statements, self) {
       } else if (statement.match(elseDetector)) {
         console.log("else detected: ");
       } else if (
-        (statementDetails = statement.match(returnStatementDetector))
+        (this.statementDetails = statement.match(returnStatementDetector))
       ) {
-        console.log(statementDetails);
-
-        currentPos += statementDetails.index;
-        console.log(currentPos);
-        from = self.getLineColumn(currentPos);
-        currentPos += statementDetails[0].length;
-        to = self.getLineColumn(currentPos);
-        currentPos++; //for counting the semicolon
-        this.flowGraph.push(
-          new ReturnWrapper(
-            {
-              value: statementDetails[1],
-              returnType: "int", //explicitly setting for temporary purpose
-            },
-            from,
-            to
-          )
-        );
-        //console.log(this.flowGraph);
-      } else if ((statementDetails = statement.match(functionCallDetector))) {
-        console.log("function detected: ");
-        console.log(statementDetails);
-        let functionName = statementDetails[1].trim();
-        let args = statementDetails[2].split(",").map(arg => arg.trim());
-        currentPos += statementDetails.index;
-        from = self.getLineColumn(currentPos);
-        currentPos += statementDetails[0].length;
-        to = self.getLineColumn(currentPos);
-        currentPos++; //for semicolon
-        if (libFunctions.find(name => name == functionName)) {
-          this.flowGraph.push(
-            new LibFunctionWrapper(
-              {
-                functionName,
-                args,
-              },
-              from,
-              to
-            )
-          );
-        } else {
-          this.flowGraph.push(
-            new FunctionWrapper(
-              {
-                functionName,
-                args,
-              },
-              from,
-              to
-            )
-          );
-        }
-      } else if ((statementDetails = statement.match(variableDetector))) {
-        console.log("variable detected: ");
-        currentPos += statementDetails.index;
-        from = self.getLineColumn(currentPos);
-        currentPos += statement.length - statementDetails.index;
-        to = self.getLineColumn(currentPos);
-        currentPos++;
-        console.log(statementDetails);
-        //this.flowGraph.push(new VariableWrapper(statementDetails, from, to));
-      } else if ((statementDetails = statement.match(expressionDetector))) {
-        console.log("expression detected: ");
-        console.log(statementDetails);
-        let expression = statementDetails[0];
-        currentPos += statementDetails.index;
-        from = self.getLineColumn(currentPos);
-        currentPos += statementDetails[0].length;
-        to = self.getLineColumn(currentPos);
-        currentPos++; //for semicolon
-        this.flowGraph.push(new ExpressionWrapper(expression, from, to));
+        this.tokenizeReturnStatement();
+      } else if (
+        (this.statementDetails = statement.match(functionCallDetector))
+      ) {
+        this.tokenizeFunctionCall();
+      } else if ((this.statementDetails = statement.match(variableDetector))) {
+        this.tokenizeVariable();
+      } else if (
+        (this.statementDetails = statement.match(expressionDetector))
+      ) {
+        this.tokenizeExpression();
       } else if (statement.match("break")) {
         console.log("break");
       } else if (statement.match("continue")) {
@@ -217,9 +122,70 @@ function Tokenizer(statements, self) {
         console.log("cant detected it: ");
       }
       console.log(statement);
-      //currentPos += statement.length + 1; //adding one to count the semicolon
     }
     console.log(this.flowGraph);
+  };
+  //sets the starting and the ending position of a token
+  this.setFromTo = () => {
+    this.currentPos += this.statementDetails.index;
+    this.from = self.getLineColumn(this.currentPos);
+    this.currentPos += this.statementDetails[0].length;
+    this.to = self.getLineColumn(this.currentPos);
+  };
+  this.tokenizeFunctionCall = () => {
+    console.log("function detected: ");
+    console.log(this.statementDetails);
+    let functionName = this.statementDetails[1].trim();
+    let args = this.statementDetails[2].split(",").map(arg => arg.trim());
+    this.setFromTo();
+    this.currentPos++; //for semicolon
+    let type = "function_call";
+    if (libFunctions.find(name => name == functionName)) {
+      type = "lib_function_call";
+    }
+    this.flowGraph.push(
+      new FunctionWrapper(
+        {
+          type,
+          functionName,
+          args,
+        },
+        this.from,
+        this.to
+      )
+    );
+  };
+  this.tokenizeVariable = () => {
+    console.log("variable detected: ");
+    this.setFromTo();
+    this.currentPos++; //for semicolon
+    console.log(this.statementDetails);
+    this.flowGraph.push(
+      new VariableWrapper(this.statementDetails, this.from, this.to)
+    );
+  };
+  this.tokenizeExpression = () => {
+    console.log("expression detected: ");
+    console.log(this.statementDetails);
+    let expression = this.statementDetails[0].trim();
+    this.setFromTo();
+    this.currentPos++; //for semicolon
+    this.flowGraph.push(new ExpressionWrapper(expression, this.from, this.to));
+  };
+  this.tokenizeReturnStatement = () => {
+    console.log(this.statementDetails);
+    this.setFromTo();
+    this.currentPos++; //for counting the semicolon
+    this.flowGraph.push(
+      new ReturnWrapper(
+        {
+          value: this.statementDetails[1],
+          returnType: "int", //explicitly setting for temporary purpose
+        },
+        this.from,
+        this.to
+      )
+    );
   };
   this.tokenizeParameters = (column, func) => {
     //console.log('line number', lineCount);
