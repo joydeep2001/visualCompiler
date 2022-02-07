@@ -30,7 +30,9 @@ const variableDetector = new RegExp(
 const expressionDetector = new RegExp(
   `(\d*\w*${optionalWhiteSpace}[-/+*=<>]+${optionalWhiteSpace}\d*\w*)*`
 );
-
+const returnStatementDetector = new RegExp(
+  `return\\s${optionalWhiteSpace}(.+${optionalWhiteSpace})*`
+);
 console.log("-------------debug--------------------");
 console.log("functionSignatureDetector", functionSignatureDetector);
 console.log("functionCallDetector", functionCallDetector);
@@ -41,6 +43,7 @@ console.log("if detector", ifDetector);
 console.log("else if detector", elseIfDetector);
 console.log("else detector", elseDetector);
 console.log("variable detector", variableDetector);
+console.log("returnStatementDetector", returnStatementDetector);
 console.log("-------------end--------------------");
 
 module.exports = {
@@ -57,4 +60,5 @@ module.exports = {
   elseDetector,
   variableDetector,
   expressionDetector,
+  returnStatementDetector,
 };
