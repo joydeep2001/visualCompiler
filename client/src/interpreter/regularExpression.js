@@ -28,7 +28,7 @@ const variableDetector = new RegExp(
   `${dataType}${optionalWhiteSpace}${identifier}`
 );
 const expressionDetector = new RegExp(
-  `(\\d*\\w*${optionalWhiteSpace}[-/+*=<>]+${optionalWhiteSpace}\\d*\\w*)*`
+  `(\\d*\\w*${optionalWhiteSpace}[-/+*=<>]+${optionalWhiteSpace}\\d*\\w*)+`
 );
 const returnStatementDetector = new RegExp(
   `return\\s${optionalWhiteSpace}(.+${optionalWhiteSpace})*`
@@ -44,6 +44,7 @@ console.log("else if detector", elseIfDetector);
 console.log("else detector", elseDetector);
 console.log("variable detector", variableDetector);
 console.log("returnStatementDetector", returnStatementDetector);
+console.log("expressionDetector", expressionDetector);
 console.log("-------------end--------------------");
 
 module.exports = {
