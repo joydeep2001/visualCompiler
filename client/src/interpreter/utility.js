@@ -77,10 +77,11 @@ function CLikeInterpreterUtilities(code) {
       //func[4] contains function name
       const { tokenizeBody, tokenizeParameters } = new Tokenizer(
         statements,
-        this
+        this,
+        func[4]
       );
       // tokenizeParameters(func.index, func);
-      tokenizeBody(startOfBody, statements, func[4]);
+      tokenizeBody(startOfBody, 0);
     }
   };
 }

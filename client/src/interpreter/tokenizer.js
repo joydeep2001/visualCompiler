@@ -27,71 +27,34 @@ const {
 //temporary array
 const libFunctions = ["printf", "scanf"];
 
-function Tokenizer(statements, self) {
-  pendingTaskStack = [];
-  lastTokenStack = [];
+function Tokenizer(statements, self, functionName) {
+  this.lastTokenStack = [];
   this.statementDetails;
   this.from, this.to;
   this.flowGraph = [];
   this.currentPos;
-  this.tokenizeBody = (startOfBody, functionName) => {
+  this.tokenizeBody = (startOfBody, firstStatementIndex) => {
     this.currentPos = startOfBody;
 
     console.log("In function " + functionName);
-    for (let i = 0; i < statements.length; i++) {
+    for (let i = firstStatementIndex; i < statements.length; i++) {
       let statement = statements[i];
-      if ((this.statementDetails = statement.match(partialForLoopDetector))) {
+      if ((this.statementDetails = statement.match("}"))) {
+        console.log("end of previous body detected: ");
+        // statements[i] = statements[i].slice(this.statementDetails[0].length);
+        statements[i] = statements[i].replace("}", " ");
+
+        console.log(">>>", statement[0].length);
+        this.flowGraph.forEach((el, index) => console.log(index, el));
+        return i;
+      }
+      if (statement.match(partialForLoopDetector)) {
         console.log("for loop detected: ");
-
-        //tokenize inititalization of for loop
-        let initialization = statement.match(/\(.+/);
-        this.currentPos += initialization.index;
-        console.log(this.currentPos);
-        this.from = self.getLineColumn(this.currentPos);
-        this.currentPos += initialization[0].length;
-        this.to = self.getLineColumn(this.currentPos);
-        this.currentPos++; //for counting the semicolon
-        this.flowGraph.push(
-          new ExpressionWrapper(initialization[0].slice(1), this.from, to)
-        );
-        console.log(this.currentPos);
-
-        //tokenize condition of for loop
-        let condition = statements[i + 1];
-        this.from = self.getLineColumn(this.currentPos);
-        this.currentPos += condition.length;
-        this.to = self.getLineColumn(this.currentPos);
-        this.currentPos++;
-        this.flowGraph.push(new ConditionWrapper(condition, this.from, to));
-        this.lastTokenStack.push(i + 1); //pushing the index of condition of the loop
-
-        //tokenize increment decrement
-        let incrementDecrementDetails = statements[i + 2].match(/.+\)/);
-        let incrementDecrement = incrementDecrementDetails[0].slice(0, -1);
-        this.from = self.getLineColumn(this.currentPos);
-        this.currentPos += incrementDecrement.length;
-        this.to = self.getLineColumn(this.currentPos);
-        this.currentPos++; //for closing bracket
-
-        this.pendingTaskStack.push(
-          new ExpressionWrapper(incrementDecrement, this.from, to)
-        );
-        console.log(this.pendingTaskStack);
-
-        //console.log(this.flowGraph);
-        if (incrementDecrement) {
-          let firstBodyToken = statements[i + 2].slice(
-            incrementDecrement.length - 1
-          );
-          if (firstBodyToken.match("{")) console.log("multiline body");
-          else console.log("single lined body");
-          console.log(firstBodyToken);
-        }
-
-        i += 2;
-        //console.log(temp.split(','));
-      } else if (statement.match(whileloopDetector)) {
+        i = this.tokenizeForLoop(i);
+      } else if ((this.statementDetails = statement.match(whileloopDetector))) {
         console.log("while loop detected: ");
+        //this.tokenizeWhileLoop(i);
+        i = this.tokenizeWhileLoop(i);
       } else if (statement.match(elseIfDetector)) {
         console.log("else if detected: ");
       } else if (statement.match(ifDetector)) {
@@ -116,14 +79,14 @@ function Tokenizer(statements, self) {
         console.log("break");
       } else if (statement.match("continue")) {
         console.log("continue");
-      } else if (statement.match("}")) {
-        console.log("end of previous body detected: ");
       } else {
         console.log("cant detected it: ");
+        console.log(statement);
       }
-      console.log(statement);
+
+      //console.log(statement);
     }
-    console.log(this.flowGraph);
+    console.log("flow graph");
   };
   //sets the starting and the ending position of a token
   this.setFromTo = () => {
@@ -205,6 +168,93 @@ function Tokenizer(statements, self) {
     }
     console.log(paramsList);
     return paramsList;
+  };
+  this.tokenizeForLoopInitialization = statement => {
+    this.statementDetails = statement.match(/\(.+/);
+    this.setFromTo();
+    this.currentPos++; //for counting the semicolon
+    this.flowGraph.push(
+      new ExpressionWrapper(
+        this.statementDetails[0].slice(1),
+        this.from,
+        this.to
+      )
+    );
+  };
+  this.tokenizeCondition = condition => {
+    this.from = self.getLineColumn(this.currentPos);
+    this.currentPos += condition.length;
+    this.to = self.getLineColumn(this.currentPos);
+    this.currentPos++; //for semicolon
+    this.flowGraph.push(new ConditionWrapper(condition, this.from, this.to));
+    return this.flowGraph.length - 1;
+  };
+  this.tokenizeForLoopIncrementDecrement = (statement, pendingTaskArr) => {
+    this.statementDetails = statement.match(/.+\)/);
+    let incrementDecrement = this.statementDetails[0].slice(0, -1);
+    this.setFromTo();
+    this.currentPos++; //for closing bracket
+    pendingTaskArr.push(
+      new ExpressionWrapper(incrementDecrement, this.from, this.to)
+    );
+    let firstStatementOfForLoopBody = statement.slice(
+      incrementDecrement.length + 1
+    );
+    return firstStatementOfForLoopBody;
+  };
+  this.tokenizeForLoop = i => {
+    let pendingTaskArr = [];
+    this.tokenizeForLoopInitialization(statements[i]);
+    let conditionIndexInFlowGraph = this.tokenizeCondition(statements[++i]);
+    let firstStatementOfForLoopBody = this.tokenizeForLoopIncrementDecrement(
+      statements[++i],
+      pendingTaskArr
+    );
+    statements[i] = firstStatementOfForLoopBody;
+    if (!statements[i].match("{")) {
+      statements[i + 1] = "}".concat(statements[i + 1]);
+      this.currentPos--; //to uncount the explicitly added '}'
+    }
+
+    let bodyEndsAtIndex = this.tokenizeBody(this.currentPos, i) - 1;
+
+    pendingTaskArr.forEach(token => this.flowGraph.push(token));
+    this.flowGraph.push({
+      type: "jump",
+      /*because i is currently holding the index of increment-decrement token, 
+      so i - 1 will be the index of condition token*/
+      instruction: i - 1,
+    });
+    this.flowGraph[conditionIndexInFlowGraph].nextIfFalse =
+      this.flowGraph.length;
+
+    return bodyEndsAtIndex;
+  };
+  this.tokenizeWhileLoop = i => {
+    let conditionStartsAtIndex = statements[i].match(/\(/).index;
+    this.currentPos += conditionStartsAtIndex;
+    let conditionIndexInFlowGraph = this.tokenizeCondition(
+      this.statementDetails[1]
+    );
+    if (!statements[i].match("{")) {
+      statements[i + 1] = "}".concat(statements[i + 1]);
+      this.currentPos--; //to uncount the explicitly added '}'
+    }
+    let bodyStartsAt = statements[i].match(/\)/);
+    console.log(bodyStartsAt);
+    statements[i] = statements[i].slice(bodyStartsAt.index + 1);
+    console.log(">>>", statements[i]);
+    let bodyEndsAtIndex = this.tokenizeBody(this.currentPos, i) - 1;
+    this.flowGraph.push({
+      type: "jump",
+      /*because i is currently holding the index condition token*/
+      instruction: i,
+    });
+
+    this.flowGraph[conditionIndexInFlowGraph].nextIfFalse =
+      this.flowGraph.length;
+
+    return bodyEndsAtIndex;
   };
 }
 
