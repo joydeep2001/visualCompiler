@@ -1,4 +1,4 @@
-const { code } = require("./code3.sample.js");
+const { code } = require("./code4.sample.js");
 const { Tokenizer } = require("./tokenizer");
 
 const {
@@ -34,13 +34,14 @@ function CLikeInterpreterUtilities(code) {
       if (code[endOfBody] == "{") braceBalance++;
       else if (code[endOfBody] == "}") braceBalance--;
     }
-    //console.log(startOfBody, endOfBody);
+    console.log(startOfBody, endOfBody);
     let functionBody = "";
     for (let i = startOfBody; i < endOfBody; i++) {
       functionBody += code[i];
     }
+
     let statements = functionBody.split(";");
-    return statements;
+    return { statements, endOfBody };
   }
 
   this.indexVsLine = [0];
@@ -69,11 +70,9 @@ function CLikeInterpreterUtilities(code) {
 
   this.createFunctionMap = () => {
     while ((func = functionSignatureDetector.exec(code))) {
-      // console.log('starts at ', func.index);
-      //console.log('ends at', functionSignatureDetector.lastIndex - 1);
-      //console.log(func[0][func[0].length - 1]);
+      console.log(func);
       const startOfBody = functionSignatureDetector.lastIndex - 1;
-      const statements = extractBody(startOfBody);
+      const { statements, endOfBody } = extractBody(startOfBody);
       //func[4] contains function name
       const { tokenizeBody, tokenizeParameters } = new Tokenizer(
         statements,
@@ -81,6 +80,7 @@ function CLikeInterpreterUtilities(code) {
         func[4]
       );
       // tokenizeParameters(func.index, func);
+      functionSignatureDetector.lastIndex = endOfBody;
       tokenizeBody(startOfBody, 0);
     }
   };
