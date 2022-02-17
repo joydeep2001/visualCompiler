@@ -32,6 +32,7 @@ function Tokenizer(statements, self, functionName) {
   this.statementDetails;
   this.from, this.to;
   this.flowGraph = [];
+  this.unspecifiedJumps = [];
   this.currentPos;
   this.tokenizeBody = (startOfBody, firstStatementIndex) => {
     this.currentPos = startOfBody;
@@ -45,7 +46,7 @@ function Tokenizer(statements, self, functionName) {
         statements[i] = statements[i].replace("}", " ");
 
         console.log(">>>", statement[0].length);
-        this.flowGraph.forEach((el, index) => console.log(index, el));
+        //this.flowGraph.forEach((el, index) => console.log(index, el));
         return i;
       }
       if (statement.match(partialForLoopDetector)) {
@@ -53,14 +54,9 @@ function Tokenizer(statements, self, functionName) {
         i = this.tokenizeForLoop(i);
       } else if ((this.statementDetails = statement.match(whileloopDetector))) {
         console.log("while loop detected: ");
-        //this.tokenizeWhileLoop(i);
         i = this.tokenizeWhileLoop(i);
-      } else if (statement.match(elseIfDetector)) {
-        console.log("else if detected: ");
-      } else if (statement.match(ifDetector)) {
-        console.log("if detected: ");
-      } else if (statement.match(elseDetector)) {
-        console.log("else detected: ");
+      } else if ((this.statementDetails = statement.match(ifDetector))) {
+        i = this.tokenizeIfElseLadder(i);
       } else if (
         (this.statementDetails = statement.match(returnStatementDetector))
       ) {
@@ -255,6 +251,53 @@ function Tokenizer(statements, self, functionName) {
       this.flowGraph.length;
 
     return bodyEndsAtIndex;
+  };
+  this.addEndOfCurlyBraceAtBegining = i => {
+    statements[i] = "}".concat(statements[i]);
+    this.currentPos--; //to uncount the explicitly added '}'
+  };
+  this.tokenizeIfElseLadder = i => {
+    let conditionStartsAtIndex = statements[i].match(/\(/).index;
+    this.currentPos += conditionStartsAtIndex;
+
+    let conditionIndexInFlowGraph = this.tokenizeCondition(
+      this.statementDetails[1]
+    );
+    if (!statements[i].match("{")) {
+      this.addEndOfCurlyBraceAtBegining(i + 1);
+    }
+    let bodyStartsAt = statements[i].match(/\)/);
+    statements[i] = statements[i].slice(bodyStartsAt.index + 1);
+    console.log("if body", statements[i]);
+    let bodyEndsAtIndex = this.tokenizeBody(this.currentPos, i) - 1;
+    i = bodyEndsAtIndex + 1;
+
+    this.flowGraph.push({
+      type: "jump",
+      instruction: null,
+    });
+    let prevUnspecifiedJump = this.flowGraph.length - 1;
+    this.flowGraph[conditionIndexInFlowGraph].nextIfFalse =
+      this.flowGraph.length + 1;
+
+    this.unspecifiedJumps.push(bodyEndsAtIndex);
+    if ((this.statementDetails = statements[i].match(elseIfDetector))) {
+      i = this.tokenizeIfElseLadder(i);
+    } else if ((this.statementDetails = statements[i].match(elseDetector))) {
+      if (!statements[i].match("{")) {
+        this.addEndOfCurlyBraceAtBegining(i + 1);
+      }
+      i = this.tokenizeBody(this.currentPos, i);
+      this.flowGraph.push({
+        type: "jump",
+        instruction: null,
+      });
+      this.flowGraph[this.flowGraph.length - 1].instruction =
+        this.flowGraph.length;
+    }
+    this.flowGraph[prevUnspecifiedJump].instruction = this.flowGraph.length;
+    //console.log(this.flowGraph);
+    return i;
   };
 }
 
