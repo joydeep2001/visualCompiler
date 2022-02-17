@@ -13,6 +13,7 @@ function ConditionWrapper(condition, from, to) {
 }
 
 function VariableWrapper(variableDetails, from, to) {
+  this.type = "variable";
   this.name = variableDetails[3];
   this.datatype =
     variableDetails[1] + (variableDetails[2] ? variableDetails[2] : "");
