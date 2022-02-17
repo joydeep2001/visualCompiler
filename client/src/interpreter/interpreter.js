@@ -1,5 +1,6 @@
 import OutputBox from "../components/OutputBox";
-import token from "./token2.sample";
+import { CLikeInterpreterUtilities } from "./utility";
+//import token from "./token2.sample";
 
 export default class Interpreter {
   static virtualCallStack = new Array();
@@ -9,7 +10,7 @@ export default class Interpreter {
   static tempReturnAddress = null;
   static currentCall = "main";
 
-  static init = self => {
+  static init = (self, code) => {
     this.self = self;
   };
   static initCallStack = () => {
@@ -21,10 +22,16 @@ export default class Interpreter {
     this.virtualCallStack.push(func);
     this.self.setState({ top: 0 });
   };
+  static tokenizeCode = code => {
+    let tokenizer = new CLikeInterpreterUtilities(code);
+    tokenizer.mapIndexVsLine();
+    this.token = tokenizer.createFunctionMap();
+  };
   static readToken = () => {
     console.log(this.self.state.programCounter);
     if (
-      this.self.state.programCounter >= token[this.currentCall]["body"].length
+      this.self.state.programCounter >=
+      this.token[this.currentCall]["body"].length
     ) {
       this.virtualCallStack.pop();
       if (this.virtualCallStack.length === 0) {
@@ -36,7 +43,7 @@ export default class Interpreter {
       }
     }
     this.currInstruction =
-      token[this.currentCall]["body"][this.self.state.programCounter];
+      this.token[this.currentCall]["body"][this.self.state.programCounter];
 
     console.log(this.currInstruction);
     if (this.currInstruction.type === "variable") {
@@ -50,9 +57,16 @@ export default class Interpreter {
     } else if (this.currInstruction.type === "return") {
       this.processReturn();
       return;
+    } else if (this.currInstruction.type === "condition") {
     }
     this.updateMark();
     //this line will update UI
+    if (this.currInstruction.type === "jump") {
+      this.self.setState(prevState => ({
+        programCounter: this.currInstruction.instruction,
+      }));
+      return;
+    }
     this.self.setState(prevState => ({
       programCounter: prevState.programCounter + 1,
     }));
@@ -70,18 +84,20 @@ export default class Interpreter {
     let top = this.virtualCallStack.length - 1;
     let activeStackFrame = this.virtualCallStack[top].data;
     let operandExp = /\$|\w+/g;
-    let operand;
+    let operandDetails = null;
     let modifiedExpression = "";
     let start = 0;
-    while ((operand = operandExp.exec(expression))) {
-      for (let i = start; i < operand.index; i++)
-        modifiedExpression += operand.input[i];
-      let variableName = operand[0];
-      if (operand[0] == "$") {
+    while ((operandDetails = operandExp.exec(expression))) {
+      for (let i = start; i < operandDetails.index; i++)
+        modifiedExpression += operandDetails.input[i];
+      let operand = operandDetails[0];
+      if (operand == "$") {
         modifiedExpression += "this.returnValueOfFunction";
+      } else if (operand.match(/\d+/)) {
+        modifiedExpression += operand;
       } else {
-        modifiedExpression += variableName.replace(
-          operand[0],
+        modifiedExpression += operand.replace(
+          operand,
           `activeStackFrame['${operand[0]}'].value`
         );
       }
@@ -89,7 +105,7 @@ export default class Interpreter {
       console.debug(start);
       console.log(modifiedExpression);
     }
-    console.log(modifiedExpression);
+    console.log("modifiedExpression", modifiedExpression);
 
     console.log(eval(modifiedExpression));
   };
@@ -107,7 +123,7 @@ export default class Interpreter {
     };
     this.virtualCallStack.push(func);
     this.self.setState(prevState => ({ top: prevState.top + 1 }));
-    const { parameters } = token[this.currentCall];
+    const { parameters } = this.token[this.currentCall];
     if (parameters.length > 0) {
       parameters.forEach((param, index) => {
         let details = {
@@ -132,14 +148,28 @@ export default class Interpreter {
     }
     this.self.setState({ programCounter: this.tempReturnAddress });
   };
+  static adjustFromTo = () => {
+    let lineAdjustment = -1;
+    let colAdjustment = -2;
+    let from = {},
+      to = {};
+    from.line = this.currInstruction.from.line + lineAdjustment;
+    to.line = this.currInstruction.to.line + lineAdjustment;
+    from.ch = this.currInstruction.from.ch + colAdjustment;
+    to.ch = this.currInstruction.to.ch + colAdjustment;
+    return {
+      from,
+      to,
+    };
+  };
   static updateMark = () => {
+    if (!this.currInstruction.from || !this.currInstruction.from) return;
+    let { from, to } = this.adjustFromTo();
     console.log(this.editor);
     if (this.self.lastMark) this.self.lastMark.clear();
-    this.self.lastMark = this.editor.markText(
-      this.currInstruction.from,
-      this.currInstruction.to,
-      { className: "codemirror-highlighted" }
-    );
+    this.self.lastMark = this.editor.markText(from, to, {
+      className: "codemirror-highlighted",
+    });
   };
 }
 //test area

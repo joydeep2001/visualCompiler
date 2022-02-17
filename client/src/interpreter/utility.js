@@ -1,4 +1,4 @@
-const { code } = require("./code4.sample.js");
+const { code } = require("./fail.sample.js");
 const { Tokenizer } = require("./tokenizer");
 
 const {
@@ -70,6 +70,7 @@ function CLikeInterpreterUtilities(code) {
 
   this.createFunctionMap = () => {
     let intermediateCode = {};
+    let func;
     while ((func = functionSignatureDetector.exec(code))) {
       //console.log(func);
       const startOfBody = functionSignatureDetector.lastIndex - 1;
@@ -82,9 +83,6 @@ function CLikeInterpreterUtilities(code) {
       );
       let parameters = tokenizeParameters(func.index, func);
 
-      console.log(intermediateCode);
-      console.log(JSON.stringify(intermediateCode));
-
       functionSignatureDetector.lastIndex = endOfBody;
       tokenizeBody(startOfBody, 0);
       flowGraph.forEach((el, index) => console.log(index, el));
@@ -93,7 +91,10 @@ function CLikeInterpreterUtilities(code) {
         body: flowGraph,
       };
     }
-    console.log(JSON.stringify(intermediateCode));
+    console.log(intermediateCode);
+    //console.log(JSON.stringify(intermediateCode));
+    return intermediateCode;
+    //return JSON.stringify(intermediateCode);
   };
 }
 
@@ -103,3 +104,7 @@ inpr.mapIndexVsLine();
 console.log("line col");
 inpr.getLineColumn(58);
 inpr.createFunctionMap();
+
+module.exports = {
+  CLikeInterpreterUtilities,
+};

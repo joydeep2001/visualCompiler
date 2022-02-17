@@ -1,4 +1,4 @@
-const express = require("express");
+//const express = require("express");
 const {
   functionCallDetector,
   functionParamsDetector,
@@ -29,11 +29,12 @@ const libFunctions = ["printf", "scanf"];
 
 function Tokenizer(statements, self, functionName) {
   this.lastTokenStack = [];
-  this.statementDetails;
-  this.from, this.to;
+  this.statementDetails = null;
+  this.from = null;
+  this.to = null;
   this.flowGraph = [];
   this.unspecifiedJumps = [];
-  this.currentPos;
+  this.currentPos = 0;
   this.tokenizeBody = (startOfBody, firstStatementIndex) => {
     this.currentPos = startOfBody;
 
@@ -65,12 +66,12 @@ function Tokenizer(statements, self, functionName) {
         (this.statementDetails = statement.match(functionCallDetector))
       ) {
         this.tokenizeFunctionCall();
-      } else if ((this.statementDetails = statement.match(variableDetector))) {
-        this.tokenizeVariable();
       } else if (
         (this.statementDetails = statement.match(expressionDetector))
       ) {
         this.tokenizeExpression();
+      } else if ((this.statementDetails = statement.match(variableDetector))) {
+        this.tokenizeVariable();
       } else if (statement.match("break")) {
         console.log("break");
       } else if (statement.match("continue")) {
