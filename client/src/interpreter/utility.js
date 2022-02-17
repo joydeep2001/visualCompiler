@@ -69,6 +69,7 @@ function CLikeInterpreterUtilities(code) {
   };
 
   this.createFunctionMap = () => {
+    let intermediateCode = {};
     while ((func = functionSignatureDetector.exec(code))) {
       //console.log(func);
       const startOfBody = functionSignatureDetector.lastIndex - 1;
@@ -79,11 +80,20 @@ function CLikeInterpreterUtilities(code) {
         this,
         func[4]
       );
-      // tokenizeParameters(func.index, func);
+      let parameters = tokenizeParameters(func.index, func);
+
+      console.log(intermediateCode);
+      console.log(JSON.stringify(intermediateCode));
+
       functionSignatureDetector.lastIndex = endOfBody;
       tokenizeBody(startOfBody, 0);
       flowGraph.forEach((el, index) => console.log(index, el));
+      intermediateCode[func[4].trim()] = {
+        parameters,
+        body: flowGraph,
+      };
     }
+    console.log(JSON.stringify(intermediateCode));
   };
 }
 

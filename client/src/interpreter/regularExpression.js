@@ -1,10 +1,12 @@
+const { param } = require("express/lib/request");
+
 const dataType = "((?:\\w+\\**\\s+\\**)+)(\\s*\\**)*";
 const identifier = "(\\w+)";
-const parameters = "\\((.*)\\)"; //loose fix
 const optionalWhiteSpace = "\\s*\\t*\\n*";
-
+const parameters = "\\((.*)\\)"; //loose fix
 const includeDetector = /#include.+/gm;
 const macroDefinitionDetector = /#define\s(\w+)\s+(.+)/g;
+
 const functionSignatureDetector = new RegExp(
   `${dataType}(${optionalWhiteSpace})${identifier}(${optionalWhiteSpace})${parameters}${optionalWhiteSpace}\\{`,
   "gm"
@@ -19,6 +21,8 @@ const variableDetector = new RegExp(
   `${dataType}${optionalWhiteSpace}${identifier}`
 );
 //const parameters = new RegExp(`\\(${variableDetector}\\)`);
+const functionParamsDetector = new RegExp(parameters, "g");
+
 const whileloopDetector = new RegExp(`while${optionalWhiteSpace}${parameters}`);
 const partialForLoopDetector = new RegExp(`for${optionalWhiteSpace}\\(.*`);
 const forloopDetector = new RegExp(`for${optionalWhiteSpace}${parameters}`);
@@ -59,4 +63,5 @@ module.exports = {
   variableDetector,
   expressionDetector,
   returnStatementDetector,
+  functionParamsDetector,
 };

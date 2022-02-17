@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   functionCallDetector,
-  parameterDefinitionDetector,
+  functionParamsDetector,
   partialForLoopDetector,
   forloopDetector,
   whileloopDetector,
@@ -153,13 +153,13 @@ function Tokenizer(statements, self, functionName) {
     //console.log(func);
     let params;
     let paramsList = [];
-    while ((params = parameterDefinitionDetector.exec(func[0]))) {
+    while ((params = functionParamsDetector.exec(func[0]))) {
       //console.log(params);
       paramsList.push({
         name: params[4],
         datatype: params[1] + (params[2] ? params[2] : ""),
         from: self.getLineColumn(params.index + column),
-        to: self.getLineColumn(parameterDefinitionDetector.lastIndex + column),
+        to: self.getLineColumn(functionParamsDetector.lastIndex + column),
       });
     }
     console.log(paramsList);
