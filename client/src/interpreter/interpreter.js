@@ -9,6 +9,7 @@ export default class Interpreter {
   static lastMark = null;
   static tempReturnAddress = null;
   static currentCall = "main";
+  static accumulator = 0;
 
   static init = (self, code) => {
     this.self = self;
@@ -58,6 +59,8 @@ export default class Interpreter {
       this.processReturn();
       return;
     } else if (this.currInstruction.type === "condition") {
+      this.processCondition();
+      return;
     }
     this.updateMark();
     //this line will update UI
@@ -70,6 +73,19 @@ export default class Interpreter {
     this.self.setState(prevState => ({
       programCounter: prevState.programCounter + 1,
     }));
+  };
+  static processCondition = () => {
+    this.processExpression(this.currInstruction.value);
+    if (this.accumulator) {
+      this.updateMark();
+      this.self.setState(prevState => ({
+        programCounter: prevState.programCounter + 1,
+      }));
+
+      return;
+    }
+    this.updateMark();
+    this.self.setState({ programCounter: this.currInstruction.nextIfFalse });
   };
   static processVariable = ({ name, initialValue, datatype }) => {
     let top = this.virtualCallStack.length - 1;
@@ -106,8 +122,8 @@ export default class Interpreter {
       console.log(modifiedExpression);
     }
     console.log("modifiedExpression", modifiedExpression);
-
-    console.log(eval(modifiedExpression));
+    this.accumulator = eval(modifiedExpression);
+    console.log(this.accumulator);
   };
   static processFunctionCall = () => {
     let argQueue = [];
