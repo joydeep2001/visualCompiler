@@ -13,7 +13,13 @@ const bodyParser = require("body-parser");
 
 app.use(cors());
 app.use(bodyParser.json());
+app.get("/", (req, res) => {
 
+  console.log("response recieved");
+  res.json("Port working");
+  
+
+})
 app.post("/api/compile", async (req, res) => {
   let fileName = `test.${getFileExtension(req.body.language)}`;
   await writeFile(fileName, req.body.code);
