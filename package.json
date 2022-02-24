@@ -23,9 +23,16 @@
   },
   "homepage": "https://github.com/joydeep2001/visualCompiler#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.1",
+    "config": "^3.3.7",
     "cors": "^2.8.5",
     "express": "^4.17.2",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.2.2",
+    "nodemailer": "^6.7.2",
     "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0"
   },
