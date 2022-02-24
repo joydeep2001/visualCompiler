@@ -1,3 +1,4 @@
+const { sendEmail, getEmailOptions } = require("../controller/sendemail");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 const { User, validate } = require("../models/user");
@@ -20,8 +21,16 @@ router.post("/", async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
   await user.save();
-
-  res.status(200).send(_.pick(user, ["name", "email"]));
+  const token = user.generateAuthToken();
+  const options = new getEmailOptions(user.email, token);
+  console.log(options);
+  try {
+    const data = await sendEmail(options);
+    res.status(200).send(_.pick(user, ["name", "email"]));
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Please Retry..");
+  }
 });
 
 module.exports = router;
