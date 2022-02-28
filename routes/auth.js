@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
   if (!validPassword)
     return res.status(400).send("Invalid username or password");
   const token = user.generateAuthToken();
-  res.status(200).send(token);
+  res.status(200).send({ token });
 });
 router.get("/activate/:token", async (req, res) => {
   jwt.verify(req.params.token, config.get("jwtPrivateKey"), async (err, id) => {
@@ -37,7 +37,11 @@ router.get("/activate/:token", async (req, res) => {
     if (!user) return res.status(404).send("<h1>User not found</h1>");
     user.isActivated = true;
     user.save();
-    res.status(200).send("account activated successfully");
+    res
+      .status(200)
+      .send(
+        "<h2>account activated successfully<a href=http://localhost:3000/login>Click Here to Login</a></h2>"
+      );
   });
 });
 let userProfileInfo = {};
