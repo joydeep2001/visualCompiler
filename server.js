@@ -10,15 +10,24 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const user = require("./routes/user");
 const auth = require("./routes/auth");
+const threeDModels = require("./routes/threeDModel");
 const config = require("config");
+const cookieParser = require("cookie-parser");
 
 if (!config.get("jwtPrivateKey")) {
   console.error("FATAL ERROR: jwt private key is not defined");
   process.exit(1);
 }
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
+app.use(cookieParser());
+
 app.get("/", (req, res) => {
   console.log("response recieved");
   res.json("Port working");
@@ -32,4 +41,6 @@ app.post("/api/compile", async (req, res) => {
 
 app.use("/user", user);
 app.use("/auth", auth);
+app.use("/3dmodels", threeDModels);
+
 app.listen(process.env.PORT);
