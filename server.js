@@ -43,4 +43,8 @@ app.use("/user", user);
 app.use("/auth", auth);
 app.use("/3dmodels", threeDModels);
 
+if (process.env.NODE_ENV == "production") {
+  app.use(express.static("client/build"));
+}
+
 app.listen(process.env.PORT);
