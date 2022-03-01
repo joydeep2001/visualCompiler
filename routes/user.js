@@ -21,9 +21,12 @@ router.post("/", async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
   await user.save();
-  const token = user.generateAuthToken();
-  const options = new getEmailOptions(user.email, token);
-  console.log(options);
+  //const token = user.generateAuthToken();
+  // const options = new getEmailOptions(user.email, token);
+  // console.log(options);
+  res.status(200).send({
+    code: "0",
+  });
   try {
     const data = await sendEmail(options);
     res.status(200).send(_.pick(user, ["name", "email"]));

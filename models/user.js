@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
   },
   password: { type: String, required: true, minlength: 5, maxlength: 1024 },
   googleLoginId: String,
-  isActivated: { type: Boolean, default: false },
+  isActivated: { type: Boolean, default: true },
 });
 
 userSchema.methods.generateAuthToken = function () {
