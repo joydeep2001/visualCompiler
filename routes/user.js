@@ -27,8 +27,9 @@ router.post("/", async (req, res) => {
   res.status(200).send({
     code: "0",
   });
+  return;
   try {
-    const data = await sendEmail(options);
+    // const data = await sendEmail(options);
     res.status(200).send(_.pick(user, ["name", "email"]));
   } catch (err) {
     console.log(err);
