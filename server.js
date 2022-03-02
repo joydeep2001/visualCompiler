@@ -1,4 +1,4 @@
-require("dotenv").config();
+// require("dotenv").config();
 const {
   writeFile,
   getFileExtension,
@@ -28,10 +28,10 @@ app.use(
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  console.log("response recieved");
-  res.json("Port working");
-});
+// app.get("/", (req, res) => {
+//   console.log("response recieved");
+//   res.json("Port working");
+// });
 app.post("/api/compile", async (req, res) => {
   let fileName = `test.${getFileExtension(req.body.language)}`;
   await writeFile(fileName, req.body.code);
@@ -42,5 +42,14 @@ app.post("/api/compile", async (req, res) => {
 app.use("/user", user);
 app.use("/auth", auth);
 app.use("/3dmodels", threeDModels);
+
+if (process.env.NODE_ENV == "production") {
+  app.use(express.static("./client/build"));
+  const path = require("path");
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 
 app.listen(process.env.PORT);
