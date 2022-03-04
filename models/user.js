@@ -4,7 +4,7 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 
 mongoose
-  .connect("mongodb://localhost/playground")
+  .connect(process.env.mongoConnectionString)
   .then(() => console.log("connected to mongodb"))
   .catch(err => console.log("couldnot connect"));
 const userSchema = new mongoose.Schema({

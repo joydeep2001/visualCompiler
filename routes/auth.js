@@ -40,39 +40,41 @@ router.get("/activate/:token", async (req, res) => {
     res
       .status(200)
       .send(
-        "<h2>account activated successfully<a href=http://localhost:3000/login>Click Here to Login</a></h2>"
+        `<h2>account activated successfully<a href=${config.get(
+          "frontEndURL"
+        )}/login>Click Here to Login</a></h2>`
       );
   });
 });
 let userProfileInfo = {};
-passport.use(
-  new googleStrategy(
-    {
-      clientID: process.env.CLIENTID,
-      clientSecret: process.env.CLIENTSECRET,
-      callbackURL: process.env.CALLBACKURL,
-    },
-    (accessToken, refreshToken, profile, done) => {
-      console.log(profile.displayName);
-      userProfileInfo = profile;
-      return done(null, profile);
-    }
-  )
-);
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-passport.deserializeUser((user, done) => {
-  done(null, user);
-});
-router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })
-);
+// passport.use(
+//   new googleStrategy(
+//     {
+//       clientID: process.env.CLIENTID,
+//       clientSecret: process.env.CLIENTSECRET,
+//       callbackURL: process.env.CALLBACKURL,
+//     },
+//     (accessToken, refreshToken, profile, done) => {
+//       console.log(profile.displayName);
+//       userProfileInfo = profile;
+//       return done(null, profile);
+//     }
+//   )
+// );
+// passport.serializeUser((user, done) => {
+//   done(null, user.id);
+// });
+// passport.deserializeUser((user, done) => {
+//   done(null, user);
+// });
+// router.get(
+//   "/google",
+//   passport.authenticate("google", {
+//     scope: ["profile", "email"],
+//   })
+// );
 
-router.get("/google/callback", passport.authenticate("google"), (req, res) => {
-  res.redirect("http://localhost:3000");
-});
+// router.get("/google/callback", passport.authenticate("google"), (req, res) => {
+//   res.redirect(`${config.get("frontEndURL")}`);
+// });
 module.exports = router;

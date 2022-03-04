@@ -1,3 +1,4 @@
 {
-  "jwtPrivateKey": "jwtPrivateKey"
+  "jwtPrivateKey": "jwtPrivateKey",
+  "frontEndURL": "frontEndURL"
 }

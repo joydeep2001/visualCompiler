@@ -1,3 +1,4 @@
+const config = require("config");
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
@@ -23,7 +24,7 @@ function getEmailOptions(emailid, accessToken) {
   this.from = "Engineer's Way";
   this.to = emailid;
   this.subject = "Verify Your account";
-  this.text = `http://localhost:3001/auth/activate/${accessToken}`;
+  this.text = `${config.get("frontEndURL")}/auth/activate/${accessToken}`;
 }
 
 module.exports = {

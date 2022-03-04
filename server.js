@@ -1,4 +1,4 @@
-// require("dotenv").config();
+//require("dotenv").config();
 const {
   writeFile,
   getFileExtension,
@@ -21,7 +21,7 @@ if (!config.get("jwtPrivateKey")) {
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://engineersway.vercel.app"],
     credentials: true,
   })
 );
