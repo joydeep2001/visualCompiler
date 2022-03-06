@@ -15,7 +15,10 @@ export default class Runtime extends React.Component {
     return (
       <div className="visualWrapper" key={"visualWrapper"}>
         <div className="callStack-wrapper">
-          <h5>Call Stack</h5>
+          <div className="callStack-header">
+            <h5>Call Stack</h5>
+          </div>
+
           <div className="callStack" key={"callstack"}>
             {/* <ActivationRecord /> */}
             {this.props.virtualCallStack
@@ -30,13 +33,19 @@ export default class Runtime extends React.Component {
           </div>
         </div>
         <div className="heap" key={"heap"}>
-          <h5>Heap</h5>
+          <div className="heap-header">
+            <h5>Heap</h5>
+          </div>
         </div>
         <div className="data" key={"data"}>
-          <h5>Data</h5>
+          <div className="data-header">
+            <h5>Data</h5>
+          </div>
         </div>
         <div className="bss" key={"bss"}>
-          <h5>bss</h5>
+          <div className="bss-header">
+            <h5>bss</h5>
+          </div>
         </div>
       </div>
     );

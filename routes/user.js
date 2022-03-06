@@ -15,7 +15,9 @@ router.post("/", async (req, res) => {
   ]);
 
   if (user)
-    return res.status(400).send("Username or email already registered..");
+    return res
+      .status(400)
+      .send({ message: "Username or email already registered.." });
 
   user = new User(_.pick(req.body, ["name", "email", "username", "password"]));
   const salt = await bcrypt.genSalt(10);
@@ -25,7 +27,7 @@ router.post("/", async (req, res) => {
   // const options = new getEmailOptions(user.email, token);
   // console.log(options);
   res.status(200).send({
-    code: "0",
+    message: "Account opened successfully..Please Login to continue",
   });
   return;
   try {
@@ -33,7 +35,7 @@ router.post("/", async (req, res) => {
     res.status(200).send(_.pick(user, ["name", "email"]));
   } catch (err) {
     console.log(err);
-    res.status(500).send("Please Retry..");
+    res.status(500).send({ message: "Please Retry.." });
   }
 });
 

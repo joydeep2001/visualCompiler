@@ -1,94 +1,123 @@
 .visualWrapper {
-    height: 700px;
-    width: 100%;
-    /* border:2px solid #000; */
-    display: grid;
-    grid-template-rows: 55px 55px;
-    grid-template-columns: 300px 300px;
-    padding: 15px;
-    animation: animate 1s;
+  height: 700px;
+  width: 100%;
+  /* border:2px solid #000; */
+  display: grid;
+  grid-template-rows: 55px 55px;
+  grid-template-columns: 300px 300px;
+  padding: 15px;
+  animation: animate 1s;
 }
 .callStack-wrapper {
-    grid-row-start: 1;
-    grid-row-end: 4;
-    background: #42f5bc;
-    
+  grid-row-start: 1;
+  grid-row-end: 4;
+  background: #008ec6;
+}
+.callStack-header {
+  height: 60px;
+  background: #0476b3;
+  /* margin-top: -5px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .callStack {
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    height: 80%;
-    
-    
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 80%;
 }
 .heap {
-    grid-row-start: 1;
-    grid-row-end: 4;
-    background: #f5da42; 
+  grid-row-start: 1;
+  grid-row-end: 4;
+  background: #f1ba00;
 }
+.heap-header {
+  height: 60px;
+  background: #e99000;
+  /* margin-top: -5px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .data {
-    grid-row-start: 4;
-    grid-row-end: 5;
-    background: #4248f5;
+  grid-row-start: 4;
+  grid-row-end: 5;
+  background: #009640;
+}
+.data-header {
+  height: 60px;
+  background: #096e31;
+  /* margin-top: -5px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .bss {
-    grid-row-start: 4;
-    grid-row-end: 5;
-    background: #9842f5;
+  grid-row-start: 4;
+  grid-row-end: 5;
+  background: #af4995;
+}
+.bss-header {
+  height: 60px;
+  background: #7d0042;
+  /* margin-top: -5px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .activationRecords {
-    width: 280px;
-    min-height: 100px;
-    border: 2px solid #565ae7;
-    border-radius: 10%;
-    background: #fff9 ;
-    padding: 5px;
-    animation: animate 1s;
+  width: 280px;
+  min-height: 100px;
+  border: 2px solid #565ae7;
+  border-radius: 10%;
+  background: #fff9;
+  padding: 5px;
+  animation: animate 1s;
 }
 .variable-cont {
-    display: flex;
-    
+  display: flex;
 }
 .variable {
-    height: 50px;
-    width: 50px;
-    border: 1px solid #9842f5;
-    margin: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: aliceblue;
-    flex-direction: column;
+  height: 50px;
+  width: 50px;
+  border: 1px solid #9842f5;
+  margin: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: aliceblue;
+  flex-direction: column;
 }
 .varName {
-    border-bottom: 1px solid black;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 500;
-    
+  background: 0476b3;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
 }
 .varValue {
-    font-size: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 h5 {
-    text-align: center;
+  color: #fff;
+  text-transform: capitalize;
 }
 .funcName {
-    display:flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 @keyframes animate {
-    0%{
-        opacity: 0;
-    }
-    100%{
-        opacity: 1;
-    }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
