@@ -75,7 +75,7 @@ export default class Body extends React.Component {
   };
   handleRunCode = async () => {
     this.setState({ output: "Compiling..." });
-    const response = await fetch("http://localhost:3001/api/compile", {
+    const response = await fetch("http://localhost:5000/api/compile", {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
