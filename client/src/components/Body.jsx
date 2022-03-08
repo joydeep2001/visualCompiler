@@ -44,7 +44,7 @@ const visuals = {
 export default class Body extends React.Component {
   state = {
     code: "",
-    language: "text",
+    language: "clike",
     ExeBoard: false,
     output: "",
 
@@ -75,7 +75,7 @@ export default class Body extends React.Component {
   };
   handleRunCode = async () => {
     this.setState({ output: "Compiling..." });
-    const response = await fetch("http://localhost:5000/api/compile", {
+    const response = await fetch("http://3.109.203.3:5000/api/compile", {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
