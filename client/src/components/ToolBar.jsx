@@ -63,10 +63,10 @@ export default function ToolBar(props) {
     <div key={"toolbar"} style={toolbarStyle}>
       <div key={"left"} style={left}>
         <select style={selectStyle} onChange={handleChange}>
-          <option value="lang">Languages</option>
+          {/* <option value="lang">Languages</option> */}
           <option value="clike">C</option>
-          <option value="clike">C++</option>
-          <option value="javascript">JavaScript</option>
+          {/* <option value="clike">C++</option>
+          <option value="javascript">JavaScript</option> */}
         </select>
         <div key={"codeHeader"} style={codeHeader}>
           <p>Code</p>
