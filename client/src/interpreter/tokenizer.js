@@ -96,7 +96,9 @@ function Tokenizer(statements, self, functionName) {
     console.log("function detected: ");
     console.log(this.statementDetails);
     let functionName = this.statementDetails[1].trim();
-    let args = this.statementDetails[2].split(",").map(arg => arg.trim());
+    //let args = this.statementDetails[2].split(",").map(arg => arg.trim());
+    //todo => add separate arguments functions here..
+    let rawArg = this.statementDetails[2];
     this.setFromTo();
     this.currentPos++; //for semicolon
     let type = "function_call";
@@ -108,7 +110,7 @@ function Tokenizer(statements, self, functionName) {
         {
           type,
           functionName,
-          args,
+          args: rawArg, //raw args should be replaced with args after adding the proper split function for args
         },
         this.from,
         this.to
