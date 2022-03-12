@@ -114,7 +114,7 @@ export default class Interpreter {
       } else {
         modifiedExpression += operand.replace(
           operand,
-          `activeStackFrame['${operand[0]}'].value`
+          `activeStackFrame['${operand}'].value`
         );
       }
       start = operandExp.lastIndex;
