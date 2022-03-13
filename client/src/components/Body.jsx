@@ -97,7 +97,7 @@ export default class Body extends React.Component {
       return;
     }
     console.log("code compiled");
-    this.setState({ output: "code compiled" });
+    this.setState({ output: "code compiled\n" });
     //initializing stack frame
     Interpreter.tokenizeCode(this.state.code);
     Interpreter.initCallStack();
