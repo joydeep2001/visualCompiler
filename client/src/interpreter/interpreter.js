@@ -38,6 +38,10 @@ export default class Interpreter {
     this.token = tokenizer.createFunctionMap();
   };
   static readToken = () => {
+    if (this.self.state.inputMode) {
+      alert("please input the values");
+      return;
+    }
     console.log(this.self.state.programCounter);
     if (
       this.self.state.programCounter >=
@@ -87,6 +91,7 @@ export default class Interpreter {
   static processLibFuncCall() {
     let top = this.virtualCallStack.length - 1;
     let activeStackFrame = this.virtualCallStack[top].data;
+    //let inputBuffer = this.self.inputBuffer;
     if (this.currInstruction.name === "printf") {
       let printf = new Printf(this.currInstruction.args, activeStackFrame);
       let stdout = printf.print();
@@ -94,8 +99,20 @@ export default class Interpreter {
       this.self.setState(prevState => ({
         output: prevState.output + stdout,
       }));
+    } else if (this.currInstruction.name === "scanf") {
+      this.self.setState({ inputMode: true });
+      scanf(
+        this.currInstruction.args,
+        this.self,
+        activeStackFrame,
+        this.exitInputMode
+      );
     }
   }
+  static exitInputMode = () => {
+    this.self.setState({ inputMode: false });
+    this.self.inputBuffer = "";
+  };
   static processCondition = () => {
     this.processExpression(this.currInstruction.value);
     if (this.accumulator) {

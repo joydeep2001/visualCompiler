@@ -47,11 +47,11 @@ export default class Body extends React.Component {
     language: "clike",
     ExeBoard: false,
     output: "",
-
+    inputMode: false,
     top: -1,
     programCounter: 0,
   };
-
+  inputBuffer = "";
   constructor(props) {
     super(props);
     Interpreter.init(this);
@@ -65,6 +65,7 @@ export default class Body extends React.Component {
   };
   handleOutputChange = val => {
     this.setState({ output: val });
+    if (this.state.inputMode) this.inputBuffer += val[val.length - 1];
   };
   handleSelect = language => {
     this.setState({ language });
