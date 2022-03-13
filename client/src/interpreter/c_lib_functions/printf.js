@@ -1,14 +1,17 @@
-class Printf {
+export default class Printf {
   outputString;
   argList = [""];
   formattedString;
   args;
-  constructor(args) {
+  constructor(args, activeStackFrame) {
+    this.activeStackFrame = activeStackFrame;
+    console.log(this.activeStackFrame);
     this.args = args;
     this.outputString = "";
   }
   print() {
     this.separateArguments();
+    console.log(this.argList);
     //console.log(this.argList);
     //this.argList.forEach(arg => console.log(arg));
     this.formattedString = this.argList[0];
@@ -19,11 +22,12 @@ class Printf {
       }
       this.outputString += this.formattedString[i];
     }
-    console.log("outputString", this.outputString);
+    //console.log("outputString", this.outputString);
+    return this.outputString;
   }
   separateArguments() {
     let isString = false;
-    this.argList;
+
     let index = 0;
 
     for (let i = 0; i < this.args.length; i++) {
@@ -80,23 +84,23 @@ class Printf {
         return;
       }
     }
-    this.outputString += `activeStackFrame[${data.trim()}]`;
+    this.outputString += `${this.activeStackFrame[data.trim()].value}`;
   }
 }
 
-let testCases = [
-  String.raw`"%s\",", "hello world"`,
-  String.raw`"%d", 5`,
-  String.raw`"hello world"`,
-  String.raw`"hello world %d %d", a, b`,
-];
-let skip = {};
-function testPrintf() {
-  testCases.forEach((testInput, index) => {
-    if (index in skip) return;
-    let printf = new Printf(testInput);
-    printf.print();
-  });
-}
+// let testCases = [
+//   String.raw`"%s\",", "hello world"`,
+//   String.raw`"%d", 5`,
+//   String.raw`"hello world"`,
+//   String.raw`"hello world %d %d", a, b`,
+// ];
+// let skip = {};
+// function testPrintf() {
+//   testCases.forEach((testInput, index) => {
+//     if (index in skip) return;
+//     let printf = new Printf(testInput);
+//     printf.print();
+//   });
+// }
 
-testPrintf();
+// testPrintf();

@@ -1,9 +1,11 @@
 import OutputBox from "../components/OutputBox";
 import { CLikeInterpreterUtilities } from "./utility";
 //import token from "./token2.sample";
+import Printf from "./c_lib_functions/printf";
+import scanf from "./c_lib_functions/scanf";
 
 export default class Interpreter {
-  static virtualCallStack = new Array();
+  static virtualCallStack = [];
   static returnValueOfFunction = null;
   static editor = null;
   static lastMark = null;
@@ -15,6 +17,13 @@ export default class Interpreter {
     this.self = self;
   };
   static initCallStack = () => {
+    this.virtualCallStack = [];
+    this.currentCall = "main";
+    this.accumulator = 0;
+    this.tempReturnAddress = null;
+    this.lastMark = null;
+    this.returnValueOfFunction = null;
+
     const func = {
       name: "main",
       data: {},
@@ -55,6 +64,7 @@ export default class Interpreter {
       this.processFunctionCall();
       return;
     } else if (this.currInstruction.type === "lib_function_call") {
+      this.processLibFuncCall();
     } else if (this.currInstruction.type === "return") {
       this.processReturn();
       return;
@@ -74,6 +84,18 @@ export default class Interpreter {
       programCounter: prevState.programCounter + 1,
     }));
   };
+  static processLibFuncCall() {
+    let top = this.virtualCallStack.length - 1;
+    let activeStackFrame = this.virtualCallStack[top].data;
+    if (this.currInstruction.name === "printf") {
+      let printf = new Printf(this.currInstruction.args, activeStackFrame);
+      let stdout = printf.print();
+      console.log(stdout);
+      this.self.setState(prevState => ({
+        output: prevState.output + stdout,
+      }));
+    }
+  }
   static processCondition = () => {
     this.processExpression(this.currInstruction.value);
     if (this.accumulator) {
