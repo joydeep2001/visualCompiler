@@ -9,7 +9,7 @@ const outputwrapper = {
 };
 
 export default function OutputBox(props) {
-  const { value, onChange } = props;
+  const { value, onChange, onUserInput } = props;
   function handleChange(editor, data, value) {
     onChange(value);
   }
@@ -25,6 +25,7 @@ export default function OutputBox(props) {
           theme: "material",
           mode: "",
         }}
+        onKeyUp={onUserInput}
       />
     </div>
   );

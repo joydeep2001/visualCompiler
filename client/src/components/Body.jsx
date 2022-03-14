@@ -6,6 +6,7 @@ import ToolBar from "./ToolBar";
 import Runtime from "./runtime/Runtime";
 import ExecutionBoard from "./ExecutionBoard";
 import Interpreter from "../interpreter/interpreter";
+
 const containStyle = {
   width: "100vw",
   height: "100vh",
@@ -47,7 +48,6 @@ export default class Body extends React.Component {
     language: "clike",
     ExeBoard: false,
     output: "",
-    inputMode: false,
     top: -1,
     programCounter: 0,
   };
@@ -56,6 +56,18 @@ export default class Body extends React.Component {
     super(props);
     Interpreter.init(this);
   }
+  handleUserInput = (editor, event) => {
+    if (event.key === "Backspace") {
+      this.inputBuffer = this.inputBuffer.slice(0, -1);
+    } else if (event.key === "Space") {
+      this.inputBuffer += " ";
+    } else if (event.key === "Enter") {
+      this.inputBuffer += "\n";
+    } else {
+      this.inputBuffer += event.key;
+    }
+    console.log(this.inputBuffer);
+  };
   handleChange = (val, editor) => {
     Interpreter.editor = editor;
     this.setState(state => {
@@ -134,6 +146,7 @@ export default class Body extends React.Component {
               <OutputBox
                 value={this.state.output}
                 onChange={this.handleOutputChange}
+                onUserInput={this.handleUserInput}
               />
             </div>
 

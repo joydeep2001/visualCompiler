@@ -12,6 +12,7 @@ export default class Interpreter {
   static tempReturnAddress = null;
   static currentCall = "main";
   static accumulator = 0;
+  static inputMode;
 
   static init = (self, code) => {
     this.self = self;
@@ -23,7 +24,7 @@ export default class Interpreter {
     this.tempReturnAddress = null;
     this.lastMark = null;
     this.returnValueOfFunction = null;
-
+    this.inputMode = false;
     const func = {
       name: "main",
       data: {},
@@ -38,7 +39,8 @@ export default class Interpreter {
     this.token = tokenizer.createFunctionMap();
   };
   static readToken = () => {
-    if (this.self.state.inputMode) {
+    let lastIndex = this.self.inputBuffer.length - 1;
+    if (this.self.inputBuffer[lastIndex] !== "\n" && this.inputMode) {
       alert("please input the values");
       return;
     }
@@ -100,7 +102,7 @@ export default class Interpreter {
         output: prevState.output + stdout,
       }));
     } else if (this.currInstruction.name === "scanf") {
-      this.self.setState({ inputMode: true });
+      this.inputMode = true;
       scanf(
         this.currInstruction.args,
         this.self,
@@ -110,7 +112,7 @@ export default class Interpreter {
     }
   }
   static exitInputMode = () => {
-    this.self.setState({ inputMode: false });
+    this.inputMode = false;
     this.self.inputBuffer = "";
   };
   static processCondition = () => {
