@@ -1,4 +1,4 @@
-//const { code } = require("./fail.sample.js");
+const { ifelse: code } = require("./fail.sample.js");
 const { Tokenizer } = require("./tokenizer");
 
 const {
@@ -98,12 +98,12 @@ function CLikeInterpreterUtilities(code) {
   };
 }
 
-// let inpr = new CLikeInterpreterUtilities(code);
-// //inpr.getMacroMap();
-// inpr.mapIndexVsLine();
-// console.log("line col");
-// inpr.getLineColumn(58);
-// inpr.createFunctionMap();
+let inpr = new CLikeInterpreterUtilities(code);
+//inpr.getMacroMap();
+inpr.mapIndexVsLine();
+console.log("line col");
+inpr.getLineColumn(58);
+inpr.createFunctionMap();
 
 module.exports = {
   CLikeInterpreterUtilities,

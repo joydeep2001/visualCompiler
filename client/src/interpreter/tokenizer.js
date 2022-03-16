@@ -1,4 +1,7 @@
-//const express = require("express");
+/*
+  THIS CODE CONVERTS THE C PROGRAM INTO A INTERMEDITATE CODE
+*/
+
 const {
   functionCallDetector,
   functionParamsDetector,
@@ -57,7 +60,7 @@ function Tokenizer(statements, self, functionName) {
         console.log("while loop detected: ");
         i = this.tokenizeWhileLoop(i);
       } else if ((this.statementDetails = statement.match(ifDetector))) {
-        i = this.tokenizeIfElseLadder(i);
+        i = this.tokenizeIfElseLadder(i) - 1;
       } else if (
         (this.statementDetails = statement.match(returnStatementDetector))
       ) {
@@ -281,7 +284,7 @@ function Tokenizer(statements, self, functionName) {
     });
     let prevUnspecifiedJump = this.flowGraph.length - 1;
     this.flowGraph[conditionIndexInFlowGraph].nextIfFalse =
-      this.flowGraph.length + 1;
+      this.flowGraph.length;
 
     this.unspecifiedJumps.push(bodyEndsAtIndex);
     if ((this.statementDetails = statements[i].match(elseIfDetector))) {

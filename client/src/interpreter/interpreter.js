@@ -13,7 +13,7 @@ export default class Interpreter {
   static currentCall = "main";
   static accumulator = 0;
   static inputMode;
-
+  static currInstruction;
   static init = (self, code) => {
     this.self = self;
   };
@@ -25,6 +25,10 @@ export default class Interpreter {
     this.lastMark = null;
     this.returnValueOfFunction = null;
     this.inputMode = false;
+    //this.updateMark();
+    // this.self.setState({
+    //   programCounter: 0,
+    // });
     const func = {
       name: "main",
       data: {},
@@ -125,8 +129,14 @@ export default class Interpreter {
 
       return;
     }
+    console.log(this.accumulator);
     this.updateMark();
-    this.self.setState({ programCounter: this.currInstruction.nextIfFalse });
+    //issue nextIfFalse value is 1 more than it should be
+    //subtracting 1 temporarily to patch the issue...if the actual cause of the
+    //issue found then that will be fixed.
+    this.self.setState({
+      programCounter: this.currInstruction.nextIfFalse,
+    });
   };
   static processVariable = ({ name, initialValue, datatype }) => {
     let top = this.virtualCallStack.length - 1;
