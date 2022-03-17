@@ -70,8 +70,8 @@ function CLikeInterpreterUtilities(code) {
 
   this.createFunctionMap = () => {
     let intermediateCode = {};
-    let func;
-    while ((func = functionSignatureDetector.exec(code))) {
+    let funcSignature;
+    while ((funcSignature = functionSignatureDetector.exec(code))) {
       //console.log(func);
       const startOfBody = functionSignatureDetector.lastIndex - 1;
       const { statements, endOfBody } = extractBody(startOfBody);
@@ -79,14 +79,14 @@ function CLikeInterpreterUtilities(code) {
       const { tokenizeBody, tokenizeParameters, flowGraph } = new Tokenizer(
         statements,
         this,
-        func[4]
+        funcSignature[4]
       );
-      let parameters = tokenizeParameters(func.index, func);
+      let parameters = tokenizeParameters(funcSignature.index, funcSignature);
 
       functionSignatureDetector.lastIndex = endOfBody;
       tokenizeBody(startOfBody, 0);
       flowGraph.forEach((el, index) => console.log(index, el));
-      intermediateCode[func[4].trim()] = {
+      intermediateCode[funcSignature[4].trim()] = {
         parameters,
         body: flowGraph,
       };
