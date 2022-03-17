@@ -153,20 +153,21 @@ function Tokenizer(statements, self, functionName) {
     );
   };
   this.tokenizeParameters = (column, func) => {
-    //console.log('line number', lineCount);
-    // console.log('start column', column);
-    //console.log(`Function name ${func[4]}\n Parameter ${func[6]}`);
-    //console.log(func);
     let params;
     let paramsList = [];
-    while ((params = functionParamsDetector.exec(func[0]))) {
-      //console.log(params);
-      paramsList.push({
-        name: params[4],
-        datatype: params[1] + (params[2] ? params[2] : ""),
-        from: self.getLineColumn(params.index + column),
-        to: self.getLineColumn(functionParamsDetector.lastIndex + column),
-      });
+    let variableDetectorGlobal = new RegExp(variableDetector, "g");
+    let isFunctionName = true;
+    while ((params = variableDetectorGlobal.exec(func[0]))) {
+      /*skipping the function name as function name and return type
+      together looks like a variable definition
+      */
+      if (isFunctionName) {
+        isFunctionName = false;
+        continue;
+      }
+      let from = self.getLineColumn(params.index + column);
+      let to = self.getLineColumn(variableDetectorGlobal.lastIndex + column);
+      paramsList.push(new VariableWrapper(params, from, to));
     }
     console.log(paramsList);
     return paramsList;
