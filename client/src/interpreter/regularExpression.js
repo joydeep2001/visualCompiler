@@ -33,9 +33,7 @@ const elseDetector = new RegExp(`else`);
 const expressionDetector = new RegExp(
   `(\\d*\\w*${optionalWhiteSpace}[-/+*=<>]+${optionalWhiteSpace}\\d*\\w*)+`
 );
-const returnStatementDetector = new RegExp(
-  `return\\s${optionalWhiteSpace}(.+${optionalWhiteSpace})*`
-);
+const returnStatementDetector = new RegExp(`return(.*)`);
 console.log("-------------debug--------------------");
 console.log("functionSignatureDetector", functionSignatureDetector);
 console.log("functionCallDetector", functionCallDetector);
