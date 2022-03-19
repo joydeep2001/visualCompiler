@@ -23,7 +23,7 @@ function VariableWrapper(variableDetails, from, to) {
 
 function ReturnWrapper(returnDetails, from, to) {
   this.type = "return";
-  this.value = `$=${returnDetails.value}`;
+  if (returnDetails.value) this.value = `$=${returnDetails.value}`;
   this.returnType = returnDetails.returnType;
   this.from = from;
   this.to = to;

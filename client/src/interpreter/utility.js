@@ -1,4 +1,4 @@
-const { ifelse: code } = require("./fail.sample.js");
+const { ret: code } = require("./fail.sample.js");
 const { Tokenizer } = require("./tokenizer");
 
 const {

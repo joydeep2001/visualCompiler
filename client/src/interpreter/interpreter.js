@@ -53,14 +53,21 @@ export default class Interpreter {
       this.self.state.programCounter >=
       this.token[this.currentCall]["body"].length
     ) {
-      this.virtualCallStack.pop();
-      if (this.virtualCallStack.length === 0) {
+      if (this.virtualCallStack.length === 1) {
         console.log("execution complete");
         this.self.setState(prevState => ({
           output: prevState.output + "\nExecution completed!!",
         }));
+        this.virtualCallStack.pop();
         return;
       }
+      let stacktop = this.virtualCallStack.length - 1;
+      let returnAddress = this.virtualCallStack[stacktop].returnAddress;
+      console.log(returnAddress);
+      this.virtualCallStack.pop();
+      this.self.setState({ programCounter: returnAddress });
+      this.currentCall = this.virtualCallStack[--stacktop].name;
+      return;
     }
     this.currInstruction =
       this.token[this.currentCall]["body"][this.self.state.programCounter];
@@ -131,9 +138,6 @@ export default class Interpreter {
     }
     console.log(this.accumulator);
     this.updateMark();
-    //issue nextIfFalse value is 1 more than it should be
-    //subtracting 1 temporarily to patch the issue...if the actual cause of the
-    //issue found then that will be fixed.
     this.self.setState({
       programCounter: this.currInstruction.nextIfFalse,
     });
@@ -178,19 +182,26 @@ export default class Interpreter {
   };
   static processFunctionCall = () => {
     let argQueue = [];
-    this.currInstruction.args.forEach(arg => {
+    //separating the arguments
+    let args = this.currInstruction.args.split(",").map(arg => arg.trim());
+    console.log(args);
+    //pushing the argument value in argQueue
+    args.forEach(arg => {
       argQueue.push(this.virtualCallStack[this.self.state.top].data[arg].value);
     });
     console.log(argQueue);
+
     this.currentCall = this.currInstruction.name;
-    const func = {
+
+    const newActivationRecord = {
       name: this.currentCall,
       data: {},
       returnAddress: this.self.state.programCounter + 1,
     };
-    this.virtualCallStack.push(func);
+    this.virtualCallStack.push(newActivationRecord);
     this.self.setState(prevState => ({ top: prevState.top + 1 }));
     const { parameters } = this.token[this.currentCall];
+    console.log(parameters);
     if (parameters.length > 0) {
       parameters.forEach((param, index) => {
         let details = {
@@ -202,6 +213,7 @@ export default class Interpreter {
         this.processVariable(details);
       });
     }
+    this.updateMark();
     this.self.setState({ programCounter: 0 });
   };
   static processReturn = () => {
@@ -211,8 +223,8 @@ export default class Interpreter {
     console.log(this.tempReturnAddress);
     if (this.currInstruction.returnType !== "void") {
       this.processExpression(this.currInstruction.value);
-      this.virtualCallStack.pop();
     }
+    this.virtualCallStack.pop();
     this.self.setState({ programCounter: this.tempReturnAddress });
   };
   static adjustFromTo = () => {

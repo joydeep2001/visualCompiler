@@ -144,8 +144,11 @@ function Tokenizer(statements, self, functionName) {
     this.flowGraph.push(
       new ReturnWrapper(
         {
-          value: this.statementDetails[1],
-          returnType: "int", //explicitly setting for temporary purpose
+          value:
+            this.statementDetails[1] &&
+            this.statementDetails[1].trim() &&
+            this.statementDetails[1],
+          returnType: "void", //explicitly setting for temporary purpose
         },
         this.from,
         this.to
