@@ -225,6 +225,7 @@ export default class Interpreter {
       this.processExpression(this.currInstruction.value);
     }
     this.virtualCallStack.pop();
+    this.updateMark();
     this.self.setState({ programCounter: this.tempReturnAddress });
   };
   static adjustFromTo = () => {
