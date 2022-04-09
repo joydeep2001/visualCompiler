@@ -1,4 +1,4 @@
-//require("dotenv").config();
+require("dotenv").config();
 const {
   writeFile,
   getFileExtension,
@@ -8,6 +8,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const allUsers = require("./routes/allUsers");
 const user = require("./routes/user");
 const auth = require("./routes/auth");
 const threeDModels = require("./routes/threeDModel");
@@ -21,7 +22,12 @@ if (!config.get("jwtPrivateKey")) {
 
 app.use(
   cors({
-    origin: "https://engineersway.in",
+    origin: [
+      "http://3.109.203.3",
+      "http://localhost",
+      "https://engineersway.in",
+      "engineersway.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -42,6 +48,7 @@ app.post("/api/compile", async (req, res) => {
 app.use("/user", user);
 app.use("/auth", auth);
 app.use("/3dmodels", threeDModels);
+app.use("/allUsers", allUsers);
 
 if (process.env.NODE_ENV == "production") {
   app.use(express.static("./client/build"));
